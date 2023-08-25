@@ -4,10 +4,7 @@ import cc.catman.plugin.core.annotations.ExtensionPoint;
 import cc.catman.plugin.core.annotations.Plugin;
 import cc.catman.plugin.core.annotations.Prop;
 import com.google.auto.service.AutoService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 
 import javax.annotation.processing.*;
@@ -81,7 +78,7 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
             this.jsonPlugin.add("extensionsPoints", jsonExtensionPoints);
             save();
         }
-        return false;
+        return true;
     }
 
     private void handlerExtensionPoint(Element element) {
@@ -90,7 +87,11 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
             return;
         }
         TypeElement typeElement= (TypeElement) element;
-        this.jsonExtensionPoints.add(typeElement.getQualifiedName().toString());
+        // 如果一个类上同时标注了 插件 和 扩展点 的注解,那么他会被多次扫描到,所以这里要去重.
+        JsonPrimitive ep = new JsonPrimitive(typeElement.getQualifiedName().toString());
+        if (!this.jsonExtensionPoints.contains(ep)){
+            this.jsonExtensionPoints.add(ep);
+        }
 
     }
 

@@ -1,4 +1,4 @@
-package org.example;
+package cat.man.plugin.example.api;
 
 import cc.catman.plugin.core.annotations.ExtensionPoint;
 import cc.catman.plugin.core.annotations.Plugin;
