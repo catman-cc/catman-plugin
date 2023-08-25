@@ -1,0 +1,11 @@
+{
+  "kind": "JAR",
+  "source": "LOCAL",
+  "libAntPatterns": [
+    "test-classes/**"
+  ],
+  "orderlyClassLoadingStrategy": [],
+  "extensionsPoints": [
+    "cn.hutool.core.bean.BeanDesc"
+  ]
+}
