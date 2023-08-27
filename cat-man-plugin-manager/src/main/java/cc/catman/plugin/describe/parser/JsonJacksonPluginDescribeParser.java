@@ -1,6 +1,6 @@
 package cc.catman.plugin.describe.parser;
 
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.StandardPluginDescribe;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
@@ -11,8 +11,8 @@ public class JsonJacksonPluginDescribeParser extends AbstractJacksonPluginDescri
     }
 
     @Override
-    public boolean supports(PluginDescribe pluginDescribe) {
-        String filename = pluginDescribe.getResource().getFilename();
+    public boolean supports(StandardPluginDescribe standardPluginDescribe) {
+        String filename = standardPluginDescribe.getResource().getFilename();
         if (filename != null) {
             return filename.endsWith(".json");
         }

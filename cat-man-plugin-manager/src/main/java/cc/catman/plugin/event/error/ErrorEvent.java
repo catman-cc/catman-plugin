@@ -2,7 +2,6 @@ package cc.catman.plugin.event.error;
 
 import cc.catman.plugin.event.AbstractEvent;
 import cc.catman.plugin.event.IEvent;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

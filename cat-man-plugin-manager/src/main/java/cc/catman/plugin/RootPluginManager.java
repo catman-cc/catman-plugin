@@ -4,7 +4,6 @@ package cc.catman.plugin;
 import cc.catman.plugin.runtime.DefaultPluginManager;
 import cc.catman.plugin.runtime.IPluginConfiguration;
 
-import java.util.Collections;
 
 public class RootPluginManager extends DefaultPluginManager {
 
@@ -12,6 +11,6 @@ public class RootPluginManager extends DefaultPluginManager {
         return new RootPluginManager(pluginConfiguration);
     }
     public RootPluginManager(IPluginConfiguration pluginConfiguration) {
-        super(pluginConfiguration, Collections.emptyList(), pluginConfiguration.loadProviders());
+        super(pluginConfiguration,  pluginConfiguration.loadProviders());
     }
 }

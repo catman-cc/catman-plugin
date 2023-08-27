@@ -2,7 +2,7 @@ package cc.catman.plugin.runtime;
 
 import cc.catman.plugin.PluginConfiguration;
 import cc.catman.plugin.classloader.configuration.IClassLoaderConfiguration;
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.describe.handler.IPluginParserInfoHandlerContext;
 import cc.catman.plugin.describe.parser.IPluginParserContext;
 import cc.catman.plugin.event.IEvent;
@@ -18,7 +18,7 @@ public interface IPluginConfiguration extends IEventBus {
 
     List<IPluginDescribeProvider> getProviders();
 
-    List<PluginDescribe> loadProviders();
+    List<StandardPluginDescribe> loadProviders();
 
     IClassLoaderConfiguration getClassLoaderConfiguration();
 
@@ -27,18 +27,22 @@ public interface IPluginConfiguration extends IEventBus {
     IPluginParserContext getPluginParserContext();
 
     IPluginParserInfoHandlerContext createPluginParserInfoHandlerContext();
+
     IPluginParserInfoHandlerContext getPluginParserInfoHandlerContext();
 
     IPluginInstanceFactory createPluginInstanceFactory();
+
     IPluginInstanceFactory getPluginInstanceFactory();
 
     IExtensionPointManagerFactory createExtensionPointManagerFactory();
+
     IExtensionPointManagerFactory getExtensionPointManagerFactory();
 
 
     PluginConfiguration addPluginDescribeProvider(IPluginDescribeProvider provider);
 
     IEventBus getEventBus();
+
     default void addEventPublishers(IEventPublisher<?, ?>... eventPublishers) {
         this.getEventBus().addEventPublishers(eventPublishers);
     }
@@ -50,8 +54,6 @@ public interface IPluginConfiguration extends IEventBus {
     default void publish(IEvent event) {
         this.getEventBus().publish(event);
     }
-
-
 
 
 }

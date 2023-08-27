@@ -22,7 +22,7 @@ public class DarkParentExtensionPointProcessor implements IExtensionPointProcess
                     ? ClassHelper.darkLikeStrict(p, clazz)
                     : ClassHelper.darkLike(p, clazz)){
                 // 直接注册没有用,还需要生成代理类
-                extensionPointInfo.addSupportType(p);
+                extensionPointInfo.setValid(true);
             }
         });
     }

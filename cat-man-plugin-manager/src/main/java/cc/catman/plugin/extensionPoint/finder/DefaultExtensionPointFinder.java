@@ -1,7 +1,7 @@
 package cc.catman.plugin.extensionPoint.finder;
 
 import cc.catman.plugin.classloader.exceptions.ClassLoadRuntimeException;
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.event.extensionPoint.ExtensionPointEvent;
 import cc.catman.plugin.event.extensionPoint.ExtensionPointEventName;
 import cc.catman.plugin.extensionPoint.ExtensionPointInfo;
@@ -18,8 +18,8 @@ public class DefaultExtensionPointFinder implements IExtensionPointFinder {
     }
 
     @Override
-    public Stream<ExtensionPointInfo> find(PluginDescribe pluginDescribe) {
-        return pluginDescribe.getExtensionsPoints().stream().map(name -> {
+    public Stream<ExtensionPointInfo> find(StandardPluginDescribe standardPluginDescribe) {
+        return standardPluginDescribe.getExtensionsPoints().stream().map(name -> {
             try {
                 Class<?> clazz = pluginInstance.getClassLoader().loadClass(name);
                 return ExtensionPointInfo.builder()
@@ -30,7 +30,7 @@ public class DefaultExtensionPointFinder implements IExtensionPointFinder {
             } catch (ClassNotFoundException | ClassLoadRuntimeException e) {
                 pluginInstance.getPluginManager().getPluginConfiguration().publish(ExtensionPointEvent.of(ExtensionPointEventName.NOT_FOUND.name(), pluginInstance.getExtensionPointManager())
                         .setError(e)
-                        .setPluginDescribe(pluginDescribe));
+                        .setStandardPluginDescribe(standardPluginDescribe));
             }
             return null;
         }).filter(Objects::nonNull);

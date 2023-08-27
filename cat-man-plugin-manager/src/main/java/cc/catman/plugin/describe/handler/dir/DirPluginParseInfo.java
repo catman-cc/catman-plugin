@@ -1,8 +1,10 @@
-package cc.catman.plugin.describe;
+package cc.catman.plugin.describe.handler.dir;
 
+import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.provider.LocalFileSystemPluginDescribeProvider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -12,8 +14,9 @@ import java.util.List;
  * 具体的每一个目录,可能会被进一步划分,所以其特征有点类似于{@link LocalFileSystemPluginDescribeProvider}
  */
 @Data
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class DirPluginDescribe extends PluginDescribe{
+public class DirPluginParseInfo extends PluginParseInfo {
 
     private List<String> dirs;
     private List<String> supportPluginDescFileNames;

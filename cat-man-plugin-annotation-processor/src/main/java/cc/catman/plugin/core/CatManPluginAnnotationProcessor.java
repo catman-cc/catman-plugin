@@ -12,8 +12,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeVisitor;
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;
@@ -114,6 +112,7 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
         for (Prop p : plugin.properties()) {
             props.addProperty(p.name(), p.value());
         }
+        jsonPlugin.add("properties",props);
     }
 
     private void save() {

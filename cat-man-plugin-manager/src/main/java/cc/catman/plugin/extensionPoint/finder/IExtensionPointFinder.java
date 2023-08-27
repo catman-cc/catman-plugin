@@ -1,6 +1,6 @@
 package cc.catman.plugin.extensionPoint.finder;
 
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.extensionPoint.ExtensionPointInfo;
 
 import java.util.stream.Stream;
@@ -10,5 +10,5 @@ import java.util.stream.Stream;
  */
 public interface IExtensionPointFinder {
 
-    Stream<ExtensionPointInfo> find(PluginDescribe pluginDescribe);
+    Stream<ExtensionPointInfo> find(StandardPluginDescribe standardPluginDescribe);
 }

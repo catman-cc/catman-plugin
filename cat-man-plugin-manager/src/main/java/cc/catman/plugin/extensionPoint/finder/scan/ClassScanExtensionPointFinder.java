@@ -1,7 +1,7 @@
 package cc.catman.plugin.extensionPoint.finder.scan;
 
 import cc.catman.plugin.common.FileUtils;
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.extensionPoint.ExtensionPointInfo;
 import cc.catman.plugin.extensionPoint.finder.IExtensionPointFinder;
 import cc.catman.plugin.runtime.IPluginInstance;
@@ -29,7 +29,7 @@ public class ClassScanExtensionPointFinder implements IExtensionPointFinder {
 
     @SneakyThrows
     protected List<String> findClassNames(){
-        Resource resource=pluginInstance.getPluginParseInfo().getPluginDescribe().getResource();
+        Resource resource=pluginInstance.getPluginParseInfo().getResource();
         File dir = resource.getFile();
         Path dirPath = dir.toPath();
         return FileUtils.deepFindFilesHandler(
@@ -44,7 +44,7 @@ public class ClassScanExtensionPointFinder implements IExtensionPointFinder {
         );
     }
     @Override
-    public Stream<ExtensionPointInfo> find(PluginDescribe pluginDescribe) {
+    public Stream<ExtensionPointInfo> find(StandardPluginDescribe standardPluginDescribe) {
         return findClassNames().stream()
                 .map(cn->{
                    ExtensionPointInfo extensionPointInfo= ExtensionPointInfo.builder()

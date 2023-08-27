@@ -1,5 +1,6 @@
 package cc.catman.plugin.runtime;
 
+import cc.catman.plugin.common.GAV;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.extensionPoint.IExtensionPointManager;
 import lombok.Getter;
@@ -9,6 +10,27 @@ import lombok.SneakyThrows;
 import java.util.List;
 
 public class DefaultPluginInstance implements IPluginInstance{
+    /**
+     * 插件名称
+     */
+    @Getter
+    @Setter
+    protected String name;
+    /**
+     * 插件所属组织
+     */
+    @Getter
+    @Setter
+    protected  String group;
+    /**
+     * 插件的版本信息
+     */
+    @Getter
+    @Setter
+    protected String version;
+    @Getter
+    @Setter
+    protected EPluginStatus status;
 
     @Getter
     @Setter
@@ -28,13 +50,23 @@ public class DefaultPluginInstance implements IPluginInstance{
     @Setter
     protected List<String> orderlyClassLoadingStrategy;
 
-    public DefaultPluginInstance(IPluginManager ownerPluginManager,PluginParseInfo parseInfo) {
+    public DefaultPluginInstance(IPluginManager ownerPluginManager, PluginParseInfo parseInfo) {
+        this.setGroup(parseInfo.getGroup());
+        this.setName(parseInfo.getName());
+        this.setVersion(parseInfo.getVersion());
+        this.setStatus(EPluginStatus.INIT);
         this.ownerPluginManager=ownerPluginManager;
         this.pluginParseInfo = parseInfo;
         this.classLoader = parseInfo.getClassLoader();
         // 加载所以的插件,然后进一步交给插件管理器来处理
-        this.pluginManager=this.ownerPluginManager.createNew(parseInfo.getPluginDescribe().getSystemDependencies(),parseInfo.getPluginDescribe().getDependencies());
-
+        this.pluginManager=this.ownerPluginManager.createNew(parseInfo.getDependencies());
+        this.pluginManager.setOwnerPluginInstance(this);
+        this.pluginManager.setGav(
+                GAV.builder()
+                        .group(pluginParseInfo.getGroup())
+                        .name(pluginParseInfo.getName())
+                        .version(pluginParseInfo.getVersion())
+                .build());
 
     }
 
@@ -51,6 +83,7 @@ public class DefaultPluginInstance implements IPluginInstance{
 
     @Override
     public void start() {
+        this.setStatus(EPluginStatus.WAIT_DEPENDENCIES);
         // 先启动依赖项
         this.pluginManager.start();
         // 然后启动扩展点管理器

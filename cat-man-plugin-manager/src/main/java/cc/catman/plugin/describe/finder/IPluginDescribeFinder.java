@@ -1,6 +1,6 @@
 package cc.catman.plugin.describe.finder;
 
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.StandardPluginDescribe;
 
 import java.util.List;
 
@@ -9,5 +9,5 @@ import java.util.List;
  */
 public interface IPluginDescribeFinder {
 
-    List<PluginDescribe> finder();
+    List<StandardPluginDescribe> finder();
 }

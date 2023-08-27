@@ -1,9 +1,6 @@
-package cc.catman.plugin.describe.handler;
+package cc.catman.plugin.describe.handler.jar;
 
-import cc.catman.plugin.classloader.cglib.ConfigurableClassLoaderEnhancer;
-import cc.catman.plugin.describe.enmu.EPluginParserStatus;
-import cc.catman.plugin.describe.JarPluginDescribe;
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.handler.AbstractURLClassLoaderPluginParserInfoHandler;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.describe.enmu.EPluginKind;
 import cc.catman.plugin.describe.enmu.EPluginSource;
@@ -13,7 +10,6 @@ import org.springframework.util.AntPathMatcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +19,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class JarPluginParserInfoHandler extends AbstractPluginParserInfoHandler {
+/**
+ * 用于解析jar类型的插件
+ */
+public class JarURLClassLoaderPluginParserInfoHandler extends AbstractURLClassLoaderPluginParserInfoHandler {
     public static final String SUPPORT_SOURCE = EPluginSource.LOCAL.name();
     public static final String SUPPORT_KIND = EPluginKind.JAR.name();
 
@@ -40,11 +39,7 @@ public class JarPluginParserInfoHandler extends AbstractPluginParserInfoHandler 
     @Override
     @SneakyThrows
     public List<PluginParseInfo> handler(PluginParseInfo parseInfo) {
-        PluginDescribe pd = parseInfo.getPluginDescribe();
-
-        final JarPluginDescribe jpd = JarPluginDescribe.class.isAssignableFrom(pd.getClass())
-                ? (JarPluginDescribe) pd
-                : parseInfo.decode(JarPluginDescribe.class);
+        final JarPluginParseInfo jpd = covert(parseInfo, JarPluginParseInfo.class);
 
         // 获取了一个jar类型的插件描述信息
         // 获取相对路径,得到项目的跟地址,然后加载其中的所有资源,最后生成一个URLClassLoader
@@ -74,15 +69,6 @@ public class JarPluginParserInfoHandler extends AbstractPluginParserInfoHandler 
                 return FileVisitResult.CONTINUE;
             }
         });
-        URL[] u = urls.toArray(new URL[]{});
-        ClassLoader p = getClass().getClassLoader();
-        URLClassLoader classLoader = new URLClassLoader(u, p);
-        ConfigurableClassLoaderEnhancer classLoaderEnhancer = parseInfo.getClassLoaderConfiguration().createClassLoaderEnhancer(parseInfo.getPluginInstance());
-        // 此处已完成类加载器,然后更新数据
-        classLoader = classLoaderEnhancer.wrapper(classLoader, new Class[]{URL[].class, ClassLoader.class}, new Object[]{u, p});
-        parseInfo.setPluginDescribe(jpd);
-        parseInfo.setStatus(EPluginParserStatus.SUCCESS);
-        parseInfo.setClassLoader(classLoader);
-        return Collections.singletonList(parseInfo);
+        return build(jpd, urls);
     }
 }

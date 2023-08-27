@@ -15,6 +15,7 @@
     <modules>
         <module>cat-man-plugin-examples-plugins</module>
         <module>cat-man-plugin-examples-api</module>
+        <module>cat-man-plugin-examples-application</module>
     </modules>
 
     <properties>

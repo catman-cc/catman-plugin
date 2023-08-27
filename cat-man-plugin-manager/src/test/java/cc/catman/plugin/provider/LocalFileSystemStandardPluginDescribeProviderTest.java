@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 import java.util.Collections;
 
-public class LocalFileSystemPluginDescribeProviderTest extends TestCase {
+public class LocalFileSystemStandardPluginDescribeProviderTest extends TestCase {
     public void test(){
         LocalFileSystemPluginDescribeProvider localFileSystemPluginDescribeProvider=LocalFileSystemPluginDescribeProvider
                 .builder()

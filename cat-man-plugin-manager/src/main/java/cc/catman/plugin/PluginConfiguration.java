@@ -2,12 +2,18 @@ package cc.catman.plugin;
 
 import cc.catman.plugin.classloader.configuration.DefaultClassLoaderConfiguration;
 import cc.catman.plugin.classloader.configuration.IClassLoaderConfiguration;
-import cc.catman.plugin.describe.PluginDescribe;
-import cc.catman.plugin.describe.handler.DefaultPluginParserInfoHandlerContext;
-import cc.catman.plugin.describe.handler.IPluginParserInfoHandlerContext;
+import cc.catman.plugin.describe.StandardPluginDescribe;
+import cc.catman.plugin.describe.handler.*;
+import cc.catman.plugin.describe.handler.classes.ClassDirURLClassLoaderPluginParserInfoHandler;
+import cc.catman.plugin.describe.handler.dir.DirURLClassLoaderPluginParserInfoHandler;
+import cc.catman.plugin.describe.handler.jar.JarURLClassLoaderPluginParserInfoHandler;
+import cc.catman.plugin.describe.handler.normalDependency.IgnoredNormalDependencyPluginParserInfoHandler;
+import cc.catman.plugin.describe.handler.raw.RawPluginParserInfoHandler;
 import cc.catman.plugin.describe.parser.DefaultPluginParserContext;
 import cc.catman.plugin.describe.parser.IPluginParserContext;
 import cc.catman.plugin.event.*;
+import cc.catman.plugin.event.extensionPoint.LoggerExtensionPointEventListener;
+import cc.catman.plugin.event.parser.LoggerPluginParseEventListener;
 import cc.catman.plugin.extensionPoint.DefaultExtensionPointManagerFactory;
 import cc.catman.plugin.extensionPoint.IExtensionPointManagerFactory;
 import cc.catman.plugin.provider.IPluginDescribeProvider;
@@ -53,7 +59,14 @@ public class PluginConfiguration implements IPluginConfiguration {
     protected IEventBus eventBus=createEventBus();
 
     private IEventBus createEventBus() {
-        return new DefaultEventBus();
+        DefaultEventBus defaultEventBus = new DefaultEventBus();
+        registryLogEventHandler(defaultEventBus);
+        return defaultEventBus;
+    }
+
+    private void registryLogEventHandler(DefaultEventBus defaultEventBus) {
+        defaultEventBus.addListener(new LoggerPluginParseEventListener());
+        defaultEventBus.addListener(new LoggerExtensionPointEventListener());
     }
 
     private IClassLoaderConfiguration createClassLoaderConfiguration() {
@@ -73,7 +86,13 @@ public class PluginConfiguration implements IPluginConfiguration {
 
     @Override
     public IPluginParserInfoHandlerContext createPluginParserInfoHandlerContext() {
-        return new DefaultPluginParserInfoHandlerContext();
+
+        return new DefaultPluginParserInfoHandlerContext(this)
+                .addHandler(new IgnoredNormalDependencyPluginParserInfoHandler())
+                .addHandler(new RawPluginParserInfoHandler(this))
+                .addHandler(new DirURLClassLoaderPluginParserInfoHandler())
+                .addHandler(new ClassDirURLClassLoaderPluginParserInfoHandler())
+                .addHandler(new JarURLClassLoaderPluginParserInfoHandler());
     }
 
     @Override
@@ -87,7 +106,7 @@ public class PluginConfiguration implements IPluginConfiguration {
     }
 
     @Override
-    public List<PluginDescribe> loadProviders() {
+    public List<StandardPluginDescribe> loadProviders() {
         return providers.stream().flatMap(p -> p.provider().stream()).collect(Collectors.toList());
     }
     @Override

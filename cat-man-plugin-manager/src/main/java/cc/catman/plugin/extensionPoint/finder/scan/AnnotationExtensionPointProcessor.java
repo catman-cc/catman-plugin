@@ -31,19 +31,7 @@ public class AnnotationExtensionPointProcessor implements IExtensionPointProcess
     public void handle(ExtensionPointInfo extensionPointInfo) {
         Class<?> clazz=extensionPointInfo.getClazz();
         if (AnnotationUtils.isCandidateClass(clazz, annotations)){
-            extensionPointInfo.addSupportType(clazz);
-            if (addParentClass){
-                Optional.ofNullable(clazz.getSuperclass())
-                        .ifPresent(extensionPointInfo::addSupportType);
-
-            }
-            if (addAllInterface){
-               Class<?>[] is=clazz.getInterfaces();
-               Optional.ofNullable(is).ifPresent(cs->{
-                   Arrays.stream(is).forEach(extensionPointInfo::addSupportType);
-               });
-
-            }
+            extensionPointInfo.setValid(true);
         }
     }
 }

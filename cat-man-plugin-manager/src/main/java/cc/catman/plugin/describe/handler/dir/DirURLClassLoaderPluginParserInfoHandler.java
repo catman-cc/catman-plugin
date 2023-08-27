@@ -1,9 +1,9 @@
-package cc.catman.plugin.describe.handler;
+package cc.catman.plugin.describe.handler.dir;
 
-import cc.catman.plugin.describe.DirPluginDescribe;
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.describe.handler.AbstractURLClassLoaderPluginParserInfoHandler;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.describe.enmu.EPluginKind;
+import cc.catman.plugin.describe.enmu.EPluginParserStatus;
 import cc.catman.plugin.describe.enmu.EPluginSource;
 import org.springframework.core.io.FileSystemResource;
 
@@ -15,7 +15,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DirPluginParserInfoHandler extends AbstractPluginParserInfoHandler{
+/**
+ * 目录类型的插件信息,用于提供一组插件
+ */
+public class DirURLClassLoaderPluginParserInfoHandler extends AbstractURLClassLoaderPluginParserInfoHandler {
 
     @Override
     protected List<String> getKinds() {
@@ -30,14 +33,12 @@ public class DirPluginParserInfoHandler extends AbstractPluginParserInfoHandler{
     @Override
     public List<PluginParseInfo> handler(PluginParseInfo parseInfo) {
 
-        PluginDescribe pd=parseInfo.getPluginDescribe();
-
-        final DirPluginDescribe dpd=DirPluginDescribe.class.isAssignableFrom(pd.getClass())
-                ?(DirPluginDescribe) pd
-                :parseInfo.decode(DirPluginDescribe.class);
+        final DirPluginParseInfo dpd= DirPluginParseInfo.class.isAssignableFrom(parseInfo.getClass())
+                ?(DirPluginParseInfo) parseInfo
+                :parseInfo.decode(DirPluginParseInfo.class);
 
         return dpd.getDirs().stream().map(Paths::get).map(basedir -> {
-            List<PluginDescribe> pluginDescribes = new ArrayList<>();
+            List<PluginParseInfo> pluginDescribes = new ArrayList<>();
             try {
                 Files.walkFileTree(basedir, new SimpleFileVisitor<Path>() {
                     @Override
@@ -47,14 +48,19 @@ public class DirPluginParserInfoHandler extends AbstractPluginParserInfoHandler{
                         if (file.toFile().isDirectory()) {
                             return FileVisitResult.CONTINUE;
                         }
+
                         String filename = file.getFileName().toString();
                         if (dpd.getSupportPluginDescFileNames().stream().anyMatch(filename::startsWith)) {
-                            // 这里表示名称符合要求,那么将会被转换为基础的插件描述信息
-                            PluginDescribe pd = new PluginDescribe();
-                            pd.setResource(new FileSystemResource(file.toFile()));
+                            // 这里表示名称符合要求,那么将会被转换为基础的插件描述信息,但该插件信息仅包含资源文件的名称
+                            // 具体的内容需要交给解析器去解析
+
+                            PluginParseInfo pd = PluginParseInfo.builder()
+                                    .status(EPluginParserStatus.WAIT_PARSE)
+                                    .resource(new FileSystemResource(file.toFile()))
+                                    .build();
+                            // 复制插件描述信息.同时需要为当前pd插入详细的描述信息
                             pluginDescribes.add(pd);
-                            // 如果在一个目录下找到了一个插件,那么就会跳过该文件的同级目录及其子目录,理论上,插件应该不会出现多级嵌套,所以这里这么处理应该没问题.
-                            return FileVisitResult.SKIP_SIBLINGS;
+                            return FileVisitResult.CONTINUE;
 
                         }
                         return FileVisitResult.CONTINUE;

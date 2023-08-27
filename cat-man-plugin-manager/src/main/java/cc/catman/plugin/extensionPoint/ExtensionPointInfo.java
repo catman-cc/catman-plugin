@@ -21,10 +21,6 @@ public class ExtensionPointInfo {
      */
     private Class<?> clazz;
 
-    /**
-     * 可以转换为的类型定义,一个类可能对应着多个扩展点的实现
-     */
-    private Set<Class<?>> supportTypes=new HashSet<>();
 
     /**
      * 该类是否被禁用
@@ -42,19 +38,11 @@ public class ExtensionPointInfo {
      * 允许针对特定类型重写类定义
      */
     private Map<Class<?>,Class<?>> overloads=new HashMap<>();
-    public void addSupportType(Class<?> clazz){
-        this.supportTypes.add(clazz);
-        this.valid=true;
+
+    public boolean canUse(){
+        return isValid()&&!isDisable();
     }
     public Class<?> toClass(Class<?> want){
         return overloads.getOrDefault(want,getClazz());
-    }
-
-    public void merge(ExtensionPointInfo other){
-        if (other.clazz!=this.clazz){
-            addSupportType(other.clazz);
-        }
-        supportTypes.addAll(other.supportTypes);
-        overloads.putAll(other.overloads);
     }
 }

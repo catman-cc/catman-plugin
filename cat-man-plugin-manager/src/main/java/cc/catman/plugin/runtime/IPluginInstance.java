@@ -10,6 +10,10 @@ import java.util.List;
  * 插件实例
  */
 public interface IPluginInstance {
+    String getGroup();
+    String getName();
+    String getVersion();
+    EPluginStatus getStatus();
     /**
      * 获取插件的类加载器
      */
@@ -18,6 +22,7 @@ public interface IPluginInstance {
     void setClassLoader(ClassLoader classLoader);
 
     PluginParseInfo getPluginParseInfo();
+    void  setPluginParseInfo(PluginParseInfo parseInfo);
 
     /**
      * 获取受控的插件管理器

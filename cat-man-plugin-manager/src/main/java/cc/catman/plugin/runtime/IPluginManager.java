@@ -1,16 +1,28 @@
 package cc.catman.plugin.runtime;
 
-import cc.catman.plugin.describe.PluginDescribe;
+import cc.catman.plugin.common.GAV;
+import cc.catman.plugin.describe.StandardPluginDescribe;
+import cc.catman.plugin.operator.IPluginExtensionPointOperator;
+import cc.catman.plugin.operator.IPluginOperator;
+import cc.catman.plugin.operator.PluginOperatorOptions;
 
 import java.util.Collections;
 import java.util.List;
 
-public interface IPluginManager {
+public interface IPluginManager  {
+    GAV getGav();
+    void setGav(GAV gav);
+
     IPluginConfiguration getPluginConfiguration();
 
-    IPluginManager createNew(List<PluginDescribe> systemPluginDescribes,List<PluginDescribe> pluginDescribes);
+    IPluginInstance getOwnerPluginInstance();
 
-    Class<?> deepFindClass(String name,int deep);
+    List<IPluginInstance> getPluginInstances();
+
+    void setOwnerPluginInstance(IPluginInstance pluginInstance);
+
+    IPluginManager createNew( List<StandardPluginDescribe> standardPluginDescribes);
+
 
     // 插件自定义加载策略
     default List<String> getOrderlyClassLoadingStrategy(){
@@ -20,5 +32,14 @@ public interface IPluginManager {
     void setOrderlyClassLoadingStrategy(List<String> strategies);
 
     void start();
+
+    Class<?> deepFindClass(String name,int deep);
+
+    IPluginOperator createPluginVisitor(PluginOperatorOptions pluginOperatorOptions);
+    default IPluginExtensionPointOperator createPluginExtensionPointOperator(){
+        return createPluginExtensionPointOperator(PluginOperatorOptions.builder().build());
+    }
+    IPluginExtensionPointOperator createPluginExtensionPointOperator(IPluginOperator pluginVisitor);
+    IPluginExtensionPointOperator createPluginExtensionPointOperator(PluginOperatorOptions pluginOperatorOptions);
 
 }

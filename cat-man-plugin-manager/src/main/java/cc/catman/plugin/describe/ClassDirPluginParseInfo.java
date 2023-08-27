@@ -1,15 +1,21 @@
 package cc.catman.plugin.describe;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class ClassDirPluginDescribe extends PluginDescribe{
+@AllArgsConstructor
+@NoArgsConstructor
+public class ClassDirPluginParseInfo extends PluginParseInfo {
     /**
      *  class文件存放的目录,会配合sourceDirs生成一个完整的地址,比如base的值是~/project,其中一个dirs的值./sub-project/target/classes,
      *  那么~/project/sub-project/target/classes下的类将会被加载.

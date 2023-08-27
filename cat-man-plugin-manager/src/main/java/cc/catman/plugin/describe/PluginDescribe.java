@@ -2,19 +2,20 @@ package cc.catman.plugin.describe;
 
 import cc.catman.plugin.describe.enmu.EPluginKind;
 import cc.catman.plugin.describe.enmu.EPluginSource;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.core.io.Resource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
- * 插件描述对象
+ * 最基础的插件描述信息,用于描述插件的源和插件的类型
  */
 @Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PluginDescribe {
-
     /**
      * 插件的来源,不同的来源可能对应着不同的处理方式
      * 比如:
@@ -32,37 +33,8 @@ public class PluginDescribe {
      */
     protected String kind;
 
-
-    /**
-     * 插件描述文件和插件的相对路径,比如:../../ 表示父级目录的父级目录
-     * Note,这里有一个安全问题,就是目录不能跳出项目配置的根目录.
-     * 每个插件都必须有该属性
-     */
-    protected String relativePath="../";
-
     /**
      * 插件对应的资源描述
      */
     protected Resource resource;
-
-    List<String> extensionsPoints=new ArrayList<>();
-
-    protected List<PluginDescribe> dependencies=new ArrayList<>();
-
-    protected List<PluginDescribe> systemDependencies=new ArrayList<>();
-
-    protected List<String> orderlyClassLoadingStrategy;
-    /**
-     * 插件对应的配置数据
-     */
-    protected Map<String,Object> properties;
-
-    public void copyFrom(PluginDescribe pluginDescribe){
-//        this.setSource(pluginDescribe.getSource());
-//        this.setKind(pluginDescribe.getKind());
-        this.setRelativePath(pluginDescribe.getRelativePath());
-        this.setResource(pluginDescribe.getResource());
-        this.setProperties(pluginDescribe.getProperties());
-    }
-
 }

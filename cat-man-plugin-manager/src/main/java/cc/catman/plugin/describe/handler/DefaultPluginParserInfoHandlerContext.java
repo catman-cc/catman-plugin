@@ -1,54 +1,108 @@
 package cc.catman.plugin.describe.handler;
 
 import cc.catman.plugin.describe.PluginParseInfo;
-import cc.catman.plugin.describe.enmu.EPluginParserStatus;
+import cc.catman.plugin.event.parser.EPluginParseEventName;
+import cc.catman.plugin.event.parser.PluginParseEvent;
+import cc.catman.plugin.runtime.IPluginConfiguration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
+import java.util.function.Predicate;
 
-public class DefaultPluginParserInfoHandlerContext implements IPluginParserInfoHandlerContext{
+public class DefaultPluginParserInfoHandlerContext implements IPluginParserInfoHandlerContext {
+    protected IPluginConfiguration pluginConfiguration;
+    protected List<IPluginParserInfoHandler> handlers = createHandlers();
 
-    protected  List<IPluginParserInfoHandler> handlers=createParserInfoHandlers();
+    public DefaultPluginParserInfoHandlerContext(IPluginConfiguration pluginConfiguration) {
+        this.pluginConfiguration = pluginConfiguration;
+    }
 
-    private List<IPluginParserInfoHandler> createParserInfoHandlers() {
-        return Arrays.asList(
-                new DirPluginParserInfoHandler(),
-                new ClassDirPluginParserInfoHandler(),
-                new JarPluginParserInfoHandler()
-                );
+    private List<IPluginParserInfoHandler> createHandlers() {
+        return new ArrayList<>();
     }
 
     @Override
     public List<PluginParseInfo> handler(PluginParseInfo parseInfo) {
-        ArrayList<PluginParseInfo> successParsed=new ArrayList<>();
-        AtomicInteger counter=new AtomicInteger(0);
+        pluginConfiguration.publish(PluginParseEvent.builder()
+                .eventName(EPluginParseEventName.START.name())
+                .parseInfo(parseInfo)
+                .build());
 
-        for (IPluginParserInfoHandler handler : this.handlers) {
-            if(handler.support(parseInfo)){
-                counter.incrementAndGet();
-                List<PluginParseInfo> ppis=handler.handler(parseInfo);
-                ppis.stream().forEach(ppi->{
-                    if (EPluginParserStatus.SUCCESS.equals(ppi.getStatus())){
-                        // 插件解析成功,无需继续解析,进入下一阶段
-                        successParsed.add(ppi);
-                        return;
-                    } else if (EPluginParserStatus.FAIL.equals(ppi.getStatus())) {
-                        // 插件解析失败
-                        return;
+        ArrayList<PluginParseInfo> successParsed = new ArrayList<>();
+        Optional<IPluginParserInfoHandler> first = this.handlers.stream().filter(h -> h.support(parseInfo)).findFirst();
+
+        if (!first.isPresent()) {
+            pluginConfiguration.publish(PluginParseEvent.builder()
+                    .eventName(EPluginParseEventName.WARN_CAN_NOT_FOUND_HANDLE.name())
+                    .parseInfo(parseInfo)
+                    .build()
+            );
+            // TODO 没有能够处理该插件的处理器,需要抛出事件
+            return successParsed;
+        }
+        List<PluginParseInfo> parsed = first.get().handler(parseInfo);
+        pluginConfiguration.publish(PluginParseEvent.builder()
+                .eventName(EPluginParseEventName.HANDLED.name())
+                .parseInfo(parseInfo)
+                .parsedList(parsed)
+                .build());
+
+        parsed
+                .forEach(ppi -> {
+                    switch (ppi.getStatus()) {
+                        case WAIT_PARSE: {
+                            // 递归进行解析操作
+                            successParsed.addAll(handler(ppi));
+                        }
+                        case COMPLETE: {
+                            // 插件完成解析
+                            // 插件解析成功,无需继续解析,进入下一阶段
+                            successParsed.add(ppi);
+                            return;
+                        }
+                        case FAIL: {
+                            // TODO 解析失败,意味着,意味着拥有错误的配置信息或者其他异常,需要推送事件
+                        }
                     }
-//                    这里需要重新解析
-                   successParsed.addAll(this.handler(ppi));
                 });
-                // 如果PluginParseInfo的状态需要继续处理,那就重新传递给handler方法
-                // 如果PluginParseInfo已经被完全解析完毕或者解析失败,走解析失败流程
-            }
-        }
-        // 这里需要处理,如果一个parseinfo没有匹配到处理器
-        if (counter.get()==0){
-            // TODO 没有找到对应的处理器
-        }
         return successParsed;
+    }
+
+    @Override
+    public List<IPluginParserInfoHandler> getHandlers() {
+        return this.handlers;
+    }
+
+    @Override
+    public IPluginParserInfoHandlerContext addHandler(IPluginParserInfoHandler handler) {
+        this.handlers.add(handler);
+        return this;
+    }
+
+    @Override
+    public IPluginParserInfoHandlerContext addFirst(IPluginParserInfoHandler handler) {
+        this.handlers.add(0, handler);
+        return this;
+    }
+
+    @Override
+    public IPluginParserInfoHandlerContext remove(Predicate<IPluginParserInfoHandler> test) {
+        this.handlers.removeIf(test);
+        return this;
+    }
+
+    @Override
+    public boolean replaceFirst(Predicate<IPluginParserInfoHandler> test, IPluginParserInfoHandler handler) {
+        Optional<IPluginParserInfoHandler> first = this.handlers.stream().filter(test).findFirst();
+        return first.map(h -> {
+            int i = this.handlers.indexOf(h);
+            if (i != -1) {
+                this.handlers.remove(i);
+                this.handlers.add(i, handler);
+                return true;
+            }
+            return false;
+        }).orElse(false);
     }
 }

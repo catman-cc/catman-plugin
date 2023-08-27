@@ -16,7 +16,7 @@ public class ParentClassExtensionPointProcessor implements IExtensionPointProces
     public void handle(ExtensionPointInfo extensionPointInfo) {
         this.parentClasses.forEach(pc->{
             if (ClassUtils.isAssignable(pc, extensionPointInfo.getClazz())){
-                extensionPointInfo.addSupportType(pc);
+                extensionPointInfo.setValid(true);
             }
         });
     }
