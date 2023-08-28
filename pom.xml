@@ -13,6 +13,7 @@
         <module>cat-man-plugin-core</module>
         <module>cat-man-plugin-annotation-processor</module>
         <module>cat-man-plugin-examples</module>
+        <module>cat-man-plugin-maven</module>
     </modules>
 
     <properties>

@@ -4,7 +4,7 @@ package cc.catman.plugin.describe.enmu;
  * 插件类型
  */
 public enum EPluginKind {
-
+    MAVEN,
     PACKAGE, // 包类型的插件,可以用于提供一组插件
     FILE,// 文件类型的插件,用于提供一个插件,但无法细分插件的具体格式,理论上该状态不应该存在,他最终会被转换为下面几个状态.
     DIR, // 在一个指定的目录下存放着一组插件

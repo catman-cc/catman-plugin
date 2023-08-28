@@ -1,11 +1,16 @@
 package cc.catman.plugin;
 
 import cat.man.plugin.example.api.NameService;
+import cc.catman.plugin.describe.handler.mvn.SimpleMavenCommandOptions;
+import cc.catman.plugin.describe.handler.mvn.SimpleMvnCommandURLClassLoaderPluginParserInfoHandler;
+import cc.catman.plugin.describe.handler.normalDependency.IgnoredNormalDependencyPluginParserInfoHandler;
 import cc.catman.plugin.event.DefaultEventPublisher;
 import cc.catman.plugin.event.DefaultIEventContext;
+import cc.catman.plugin.event.EventListenerBuilder;
 import cc.catman.plugin.event.ObjectEventAck;
 import cc.catman.plugin.event.extensionPoint.ExtensionPointEvent;
 import cc.catman.plugin.event.extensionPoint.ExtensionPointInfoEvent;
+import cc.catman.plugin.event.extensionPoint.LoggerExtensionPointEventListener;
 import cc.catman.plugin.operator.IPluginExtensionPointOperator;
 import cc.catman.plugin.provider.DeveloperClassesFilePluginDescribeProvider;
 
@@ -24,6 +29,8 @@ public class Application {
                 DeveloperClassesFilePluginDescribeProvider.of("cat-man-plugin-examples/cat-man-plugin-examples-plugins/target/classes/");
 
         PluginConfiguration pluginConfiguration = new PluginConfiguration();
+//        pluginConfiguration.getPluginParserInfoHandlerContext().replaceFirst(p-> p.getClass().equals(IgnoredNormalDependencyPluginParserInfoHandler.class),
+//                new SimpleMvnCommandURLClassLoaderPluginParserInfoHandler(SimpleMavenCommandOptions.builder().build()));
 
         pluginConfiguration.addPluginDescribeProvider(provider);
 
@@ -31,6 +38,8 @@ public class Application {
                 new DefaultEventPublisher<>(new DefaultIEventContext<ExtensionPointEvent, ObjectEventAck>()),
                 new DefaultEventPublisher<>(new DefaultIEventContext<ExtensionPointInfoEvent, ObjectEventAck>())
         );
+
+        pluginConfiguration.addListener(EventListenerBuilder.wrapper(new LoggerExtensionPointEventListener()));
         RootPluginManager pm = RootPluginManager.from(pluginConfiguration);
         pm.start();
 

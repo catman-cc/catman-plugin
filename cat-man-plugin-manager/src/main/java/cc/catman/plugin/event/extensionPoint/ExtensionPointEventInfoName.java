@@ -1,6 +1,8 @@
 package cc.catman.plugin.event.extensionPoint;
 
-public enum ExtensionPointEventInfoName {
+import cc.catman.plugin.event.IEvenNameEnum;
+
+public enum ExtensionPointEventInfoName implements IEvenNameEnum {
     MERGE,
     ADD,
 }
