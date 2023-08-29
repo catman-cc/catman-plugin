@@ -59,7 +59,7 @@ public class LocalFileSystemPluginDescribeProvider implements IPluginDescribePro
                          Path relativePath=basedir.relativize(file);
 
                          if (pluginDescFileNamesPatterns.stream().anyMatch(p-> pathMatcher.match(p,relativePath.toString()))){
-                             standardPluginDescribes.add(StandardPluginDescribe.builder().resource(new FileSystemResource(relativePath)).build());
+                             standardPluginDescribes.add(StandardPluginDescribe.builder().describeResource(new FileSystemResource(relativePath)).build());
                              // 如果在一个目录下找到了一个插件,那么就会跳过该文件的同级目录及其子目录,理论上,插件应该不会出现多级嵌套,所以这里这么处理应该没问题.
                              // 算了还是完全放开吧
                              return FileVisitResult.CONTINUE;

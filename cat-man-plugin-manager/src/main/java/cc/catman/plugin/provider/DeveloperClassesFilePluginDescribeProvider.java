@@ -104,7 +104,7 @@ public class DeveloperClassesFilePluginDescribeProvider extends AbstractPluginDe
 
                                 if (pluginDescFileNamesPatterns.stream().anyMatch(p -> pathMatcher.match(p, relativePath.toString()))) {
                                     standardPluginDescribes.add(
-                                            StandardPluginDescribe.builder().resource(new FileSystemResource(file))
+                                            StandardPluginDescribe.builder().describeResource(new FileSystemResource(file))
                                                     .afterParsers(afterParsers)
                                                     .afterHandlers(afterHandlers)
                                                     .build()

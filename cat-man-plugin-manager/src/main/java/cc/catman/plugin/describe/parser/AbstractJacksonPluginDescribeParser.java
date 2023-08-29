@@ -16,7 +16,7 @@ public abstract class AbstractJacksonPluginDescribeParser implements  IPluginDes
     @Override
     @SneakyThrows
     public PluginParseInfo wrapper(StandardPluginDescribe standardPluginDescribe) {
-        JsonNode node = objectMapper.readTree(standardPluginDescribe.getResource().getInputStream());
+        JsonNode node = objectMapper.readTree(standardPluginDescribe.getDescribeResource().getInputStream());
         String kind=node.get("kind").asText();
         String source=node.get("source").asText();
         // 如果pluginDescribe已经包含了一些基础信息,这里的copy操作需要将原始的信息传递过来.
@@ -28,7 +28,7 @@ public abstract class AbstractJacksonPluginDescribeParser implements  IPluginDes
                 .status(EPluginParserStatus.WAIT_PARSE)
                 .afterHandlers(standardPluginDescribe.getAfterHandlers())
                 .afterParsers(standardPluginDescribe.getAfterParsers())
-                .resource(standardPluginDescribe.getResource())
+                .describeResource(standardPluginDescribe.getDescribeResource())
                 .build();
         // 初次解析时,插件的描述信息只有上述内容,因为上述内容是不需要解析配置文件就可以获取的数据
         parseInfo.callAfterParsers();
@@ -38,7 +38,7 @@ public abstract class AbstractJacksonPluginDescribeParser implements  IPluginDes
     @Override
     @SneakyThrows
     public <T extends StandardPluginDescribe> T decode(PluginParseInfo parseInfo, Class<T> clazz) {
-        T res=this.objectMapper.readValue(parseInfo.getResource().getInputStream(),clazz);
+        T res=this.objectMapper.readValue(parseInfo.getDescribeResource().getInputStream(),clazz);
         // 后执行,为了让运行时修改的数据,覆盖默认信息
         res.copyFrom(parseInfo);
         return res;

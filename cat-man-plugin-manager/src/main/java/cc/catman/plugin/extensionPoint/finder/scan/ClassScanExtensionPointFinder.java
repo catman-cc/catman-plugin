@@ -29,7 +29,7 @@ public class ClassScanExtensionPointFinder implements IExtensionPointFinder {
 
     @SneakyThrows
     protected List<String> findClassNames(){
-        Resource resource=pluginInstance.getPluginParseInfo().getResource();
+        Resource resource=pluginInstance.getPluginParseInfo().getDescribeResource();
         File dir = resource.getFile();
         Path dirPath = dir.toPath();
         return FileUtils.deepFindFilesHandler(

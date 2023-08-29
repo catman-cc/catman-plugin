@@ -4,30 +4,40 @@ package cc.catman.plugin.describe.parser;
 import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.describe.enmu.EPluginParserStatus;
+import cc.catman.plugin.describe.resources.CombineResourceBrowser;
+import cc.catman.plugin.describe.resources.DirResourceBrowser;
+import cc.catman.plugin.describe.resources.JarResourceBrowser;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultPluginParserContext implements IPluginParserContext{
+public class DefaultPluginParserContext implements IPluginParserContext {
 
-    protected List<IPluginDescribeParser> parsers=createParsers();
+    @Getter
+    protected List<IPluginDescribeParser> parsers = createParsers();
 
-    private List<IPluginDescribeParser> createParsers()
-    {
-        List<IPluginDescribeParser> parsers=new ArrayList<>();
+    private List<IPluginDescribeParser> createParsers() {
+        List<IPluginDescribeParser> parsers = new ArrayList<>();
         parsers.add(new JsonJacksonPluginDescribeParser());
+        parsers.add(new FinderPluginDescribeParser(
+                        new CombineResourceBrowser()
+                                .addResourceBrowser(new JarResourceBrowser())
+                                .addResourceBrowser(new DirResourceBrowser())
+                )
+        );
         return parsers;
     }
 
     @Override
     public List<PluginParseInfo> parser(StandardPluginDescribe standardPluginDescribe) {
         for (IPluginDescribeParser parser : parsers) {
-            if (parser.supports(standardPluginDescribe)){
-                PluginParseInfo parseInfo=parser.wrapper(standardPluginDescribe);
+            if (parser.supports(standardPluginDescribe)) {
+                PluginParseInfo parseInfo = parser.wrapper(standardPluginDescribe);
                 parseInfo.setStatus(EPluginParserStatus.WAIT_PARSE);
                 parseInfo.setPluginParserContext(this);
-              return Collections.singletonList(parseInfo);
+                return Collections.singletonList(parseInfo);
             }
         }
         // TODO 这里需要特殊处理,上报异常,而不是中断操作,最后又事件总线统一处理异常问题.

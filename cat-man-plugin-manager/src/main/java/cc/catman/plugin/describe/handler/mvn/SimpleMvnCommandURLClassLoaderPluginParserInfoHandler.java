@@ -51,7 +51,7 @@ public class SimpleMvnCommandURLClassLoaderPluginParserInfoHandler extends Abstr
     public List<PluginParseInfo> handler(PluginParseInfo parseInfo) {
         MvnCommandPluginParseInfo mppd=covert(parseInfo,MvnCommandPluginParseInfo.class);
         try {
-            String command = String.format("\"cd ~/&&%s dependency:get -DgroupId=%s -DartifactId=%s -Dversion=%s -Dclassifier=sources -DrepoUrl=%s\n\""
+            String command = String.format("%s dependency:get -DgroupId=%s -DartifactId=%s -Dversion=%s -Dclassifier=sources -DrepoUrl=%s"
                     ,options.getMvnCommand()
                     ,mppd.group
                     ,mppd.name
@@ -59,7 +59,7 @@ public class SimpleMvnCommandURLClassLoaderPluginParserInfoHandler extends Abstr
                     ,options.getRepositoryUrl()
             ); // 替换为你要执行的命令
             ProcessBuilder processBuilder = new ProcessBuilder()
-                    .command("cd","~/.config","&&pwd");
+                    .command(command.split(" "));
 //                    .command("pwd");
 //                    .command(command);
 //                    .command(command.split(" "))

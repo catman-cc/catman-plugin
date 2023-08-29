@@ -51,6 +51,13 @@ public class DefaultPluginParserInfoHandlerContext implements IPluginParserInfoH
         parsed
                 .forEach(ppi -> {
                     switch (ppi.getStatus()) {
+                        case RE_PARSE:{
+                            // 当前插件在处理之后,生成了全新的插件信息,需要重新解析,并输出新的描述文件
+                            pluginConfiguration.getPluginParserContext().parser(ppi)
+                                    .forEach(pi->{
+                                       successParsed.addAll(handler(pi));
+                                    });
+                        }
                         case WAIT_PARSE: {
                             // 递归进行解析操作
                             successParsed.addAll(handler(ppi));

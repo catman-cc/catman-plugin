@@ -31,7 +31,7 @@ public class ClassDirURLClassLoaderPluginParserInfoHandler extends AbstractURLCl
                 ?(ClassDirPluginParseInfo) parseInfo
                 :parseInfo.decode(ClassDirPluginParseInfo.class);
         // 理论上这里的目录就是源码的根目录了,所以,可以直接从这里配置ClassLoader的根路径即可
-        Path baseDir= spd.getResource().getFile().toPath().resolve(spd.getRelativePath()).normalize();
+        Path baseDir= spd.getDescribeResource().getFile().toPath().resolve(spd.getRelativePath()).normalize();
         spd.setBase(new FileSystemResource(baseDir));
         return build(spd, Collections.singletonList(baseDir.toFile().toURI().toURL()));
     }

@@ -56,7 +56,7 @@ public class DirURLClassLoaderPluginParserInfoHandler extends AbstractURLClassLo
 
                             PluginParseInfo pd = PluginParseInfo.builder()
                                     .status(EPluginParserStatus.WAIT_PARSE)
-                                    .resource(new FileSystemResource(file.toFile()))
+                                    .describeResource(new FileSystemResource(file.toFile()))
                                     .build();
                             // 复制插件描述信息.同时需要为当前pd插入详细的描述信息
                             pluginDescribes.add(pd);

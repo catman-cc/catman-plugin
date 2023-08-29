@@ -24,7 +24,7 @@ public class RawPluginParserInfoHandler extends AbstractPluginParserInfoHandler 
     public boolean support(PluginParseInfo parseInfo) {
         return  (!StringUtils.hasText(parseInfo.getKind()))&&
                 (!StringUtils.hasText(parseInfo.getSource()))&&
-                Objects.nonNull(parseInfo.getResource());
+                Objects.nonNull(parseInfo.getDescribeResource());
     }
 
     @Override

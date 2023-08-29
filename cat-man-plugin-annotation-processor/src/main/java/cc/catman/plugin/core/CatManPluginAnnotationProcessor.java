@@ -6,6 +6,8 @@ import cc.catman.plugin.core.annotations.Prop;
 import com.google.auto.service.AutoService;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -14,6 +16,9 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
@@ -34,7 +39,7 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
     public static final String PLUGIN_ANNOTATION_NAME = "cc.catman.plugin.core.annotations.Plugin";
     public static final String EXTENSION_POINT_ANNOTATION_NAME = "cc.catman.plugin.core.annotations.ExtensionPoint";
 
-    public static final String PLUGIN_DESC_FILE_NAME = "cat-man-plugin.json";
+    public static final String PLUGIN_DESC_FILE_NAME = "META-INF/cat-man-plugin/cat-man-plugin.json";
 
     private Messager messager;
     private Gson gson;
@@ -113,6 +118,23 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
             props.addProperty(p.name(), p.value());
         }
         jsonPlugin.add("properties",props);
+        resavePom();
+    }
+
+    private void resavePom() {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document n = documentBuilder.newDocument();
+            Document d = documentBuilder.parse("/Users/jpanda/work/codes/customer/cat-man/cat-man-plugin/cat-man-plugin-core/pom.xml");
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void save() {

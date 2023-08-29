@@ -37,11 +37,10 @@ public class BasicPluginDescribe extends PluginDescribe {
     @Builder.Default
     protected String relativePath="../";
 
+    protected boolean continueToFindNewConfigurationFiles;
+
+
     @Builder.Default
     List<String> extensionsPoints = new ArrayList<>();
-    /**
-     * 运行时,需要使用的第三方库,这里的第三方库并不是插件,只是普通的jar包
-     */
-    @Builder.Default
-    protected List<GAV> normalDependencyLibraries=new ArrayList<>();
+
 }

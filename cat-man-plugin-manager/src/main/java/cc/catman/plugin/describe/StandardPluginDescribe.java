@@ -1,6 +1,5 @@
 package cc.catman.plugin.describe;
 
-import cc.catman.plugin.common.GAV;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -48,7 +47,7 @@ public class StandardPluginDescribe extends BasicPluginDescribe {
 
     public void copyFrom(StandardPluginDescribe standardPluginDescribe) {
         this.setRelativePath(standardPluginDescribe.getRelativePath());
-        this.setResource(standardPluginDescribe.getResource());
+        this.setDescribeResource(standardPluginDescribe.getDescribeResource());
         this.setProperties(standardPluginDescribe.getProperties());
     }
 
