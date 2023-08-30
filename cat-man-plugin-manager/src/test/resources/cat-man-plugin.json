@@ -1,11 +1,20 @@
 {
   "kind": "JAR",
   "source": "LOCAL",
+  "name": "cat-man",
   "libAntPatterns": [
     "test-classes/**"
   ],
   "orderlyClassLoadingStrategy": [],
   "extensionsPoints": [
     "cn.hutool.core.bean.BeanDesc"
-  ]
+  ],
+  "settings": {
+    "feature": {
+      "disables": [1,2,3],
+      "help": {
+        "info": "message"
+      }
+    }
+  }
 }

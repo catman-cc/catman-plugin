@@ -22,6 +22,5 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MavenPluginParseInfo extends PluginParseInfo {
-    private Object object;
     private Path pluginDir;
 }

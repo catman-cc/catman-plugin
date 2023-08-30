@@ -13,7 +13,7 @@ public class MavenOptions {
 
     private String mavenHome;
 
-    private String LocalRepositoryDirectory;
+    private String localRepositoryDirectory;
 
     private String pluginRepositoryDirectory;
 

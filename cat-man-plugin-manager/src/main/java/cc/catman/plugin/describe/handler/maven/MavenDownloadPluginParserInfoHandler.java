@@ -16,8 +16,8 @@ import java.util.*;
  * 对这个方案还是不太喜欢...
  */
 public class MavenDownloadPluginParserInfoHandler extends AbstractURLClassLoaderPluginParserInfoHandler {
-    private MavenOptions mavenOptions;
-    private Invoker invoker ;
+    protected MavenOptions mavenOptions;
+    protected Invoker invoker ;
 
     public MavenDownloadPluginParserInfoHandler(MavenOptions mavenOptions) {
         this.mavenOptions = mavenOptions;
@@ -41,7 +41,7 @@ public class MavenDownloadPluginParserInfoHandler extends AbstractURLClassLoader
         return invoker;
     }
 
-    public InvocationRequest createInvocationRequestCopy(Invoker invoker,MavenPluginParseInfo mavenPluginParseInfo){
+    public InvocationRequest createInvocationRequestCopy(Invoker invoker,PluginParseInfo mavenPluginParseInfo,List<String> command){
         InvocationRequest request = new DefaultInvocationRequest();
 
         Optional.ofNullable(this.mavenOptions.getUserSettingPath()).ifPresent(settings->{
@@ -58,23 +58,16 @@ public class MavenDownloadPluginParserInfoHandler extends AbstractURLClassLoader
             request.setBaseDirectory(Paths.get(bd).toFile());
         });
         request.setDebug(this.mavenOptions.isDebug());
-        // dependency:copy -Dartifact=#maven.com.google.guava:lombok:1.16.10 -DoutputDirectory=./
-        List<String> list = new ArrayList<>(Arrays.asList(ECommand.DEPENDENCY_COPY.getCommand(),
-                "--debug",
-                "-Dartifact=" + mavenPluginParseInfo.getGroup()+":"+mavenPluginParseInfo.getName()+":"+mavenPluginParseInfo.getVersion(),
-                "-DoutputDirectory=" + mavenPluginParseInfo.getPluginDir()));
-
         Optional.ofNullable(this.mavenOptions.getRepoUrl())
                 .ifPresent(ru->{
-                    list.add("-DrepoUrl=" + ru);
+                    command.add("-DrepoUrl=" + ru);
                 });
-
-        request.setGoals(list);
+        request.setGoals(command);
 
         return request;
     }
 
-    public InvocationRequest createInvocationRequest(Invoker invoker,MavenPluginParseInfo mavenPluginParseInfo){
+    public InvocationRequest createInvocationRequest(Invoker invoker,PluginParseInfo mavenPluginParseInfo){
         InvocationRequest request = new DefaultInvocationRequest();
         List<String> list = Arrays.asList("dependency:get",
                 "--debug",
@@ -105,7 +98,7 @@ public class MavenDownloadPluginParserInfoHandler extends AbstractURLClassLoader
         return request;
     }
 
-    protected InvocationRequest beforeInvocationRequestExec(InvocationRequest request,Invoker invoker,MavenPluginParseInfo mavenPluginParseInfo){
+    protected InvocationRequest beforeInvocationRequestExec(InvocationRequest request,Invoker invoker,PluginParseInfo mavenPluginParseInfo){
         return request;
     }
 
@@ -114,21 +107,22 @@ public class MavenDownloadPluginParserInfoHandler extends AbstractURLClassLoader
         return false;
     }
 
-
+    protected InvocationResult invoke(PluginParseInfo mppi,List<String> command) throws MavenInvocationException {
+        InvocationRequest request = createInvocationRequestCopy(this.invoker, mppi,command);
+        request=beforeInvocationRequestExec(request,this.invoker,mppi);
+        return this.invoker.execute(request);
+    }
     @SneakyThrows
     @Override
     public List<PluginParseInfo> handler(PluginParseInfo parseInfo) {
-        MavenPluginParseInfo mppi=covert(parseInfo, MavenPluginParseInfo.class);
 
         Path pluginDir = this.mavenOptions.getPluginStorageStrategy().covert(Paths.get(this.mavenOptions.getPluginRepositoryDirectory()), parseInfo, true);
-
-        mppi.setPluginDir(pluginDir);
-
-        // 获取插件的gav信息,然后下载该插件到指定的目录下
-        InvocationRequest request = createInvocationRequestCopy(this.invoker, mppi);
-        request=beforeInvocationRequestExec(request,this.invoker,mppi);
-
-        InvocationResult result = this.invoker.execute(request);
+        // dependency:copy -Dartifact=#maven.com.google.guava:lombok:1.16.10 -DoutputDirectory=./
+        List<String> list = new ArrayList<>(Arrays.asList(ECommand.DEPENDENCY_COPY.getCommand(),
+                "--debug",
+                "-Dartifact=" + parseInfo.getGroup()+":"+parseInfo.getName()+":"+parseInfo.getVersion(),
+                "-DoutputDirectory=" + pluginDir));
+        InvocationResult result = invoke(parseInfo,list);
         if (result.getExitCode()!=0){
             // TODO 异常
         }

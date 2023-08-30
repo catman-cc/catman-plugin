@@ -3,6 +3,8 @@ package cc.catman.plugin.describe.parser;
 import cc.catman.plugin.common.Constants;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.describe.StandardPluginDescribe;
+import cc.catman.plugin.describe.enmu.DescribeConstants;
+import cc.catman.plugin.describe.enmu.EDescribeLabel;
 import cc.catman.plugin.describe.enmu.EPluginParserStatus;
 import cc.catman.plugin.describe.resources.IResourceBrowser;
 import cc.catman.plugin.describe.resources.ResourceVisitor;
@@ -53,7 +55,9 @@ public class FinderPluginDescribeParser implements IPluginDescribeParser {
                 return Optional.ofNullable((resource.getFilename()))
                         .map(fn->{
                             if (fn.startsWith(Constants.PLUGIN_DESCRIBE_FILE_NAME+".")){
-                                // 将描述文件传入配置
+                                //  将描述文件传入配置,此时需要继续处理描述文件的解析操作
+                                pluginDescribe.getLabels()
+                                        .add(EDescribeLabel.EXCLUSIVE_PARSER.label(), DescribeConstants.NEED_PARSER_PLUGIN_DESCRIBE_FILE);
                                 pluginDescribe.setDescribeResource(resource);
                                 return true;
                             }
@@ -69,13 +73,17 @@ public class FinderPluginDescribeParser implements IPluginDescribeParser {
                         .map(fn->{
                             if (fn.startsWith(Constants.PLUGIN_MAVEN_NORMAL_DEPENDENCIES_FILE_NAME+".")){
                                 // 将描述文件传入配置
+                                // 加入一个需要解析MAVEN文件的标签
+                                pluginDescribe.getLabels()
+                                        .add(EDescribeLabel.EXCLUSIVE_PARSER.label(), DescribeConstants.NEED_PARSER_MAVEN_NORMAL_LIBS_FILE);
+
                                 pluginDescribe.setNormalDependencyType("MAVEN");
-                                pluginDescribe.setNormalDependencyLibrariesResource(resource);
+                                pluginDescribe.setNormalDependencyLibrariesDescrbieResource(resource);
                                 return true;
                             }
                             return false;
                         })
-                        .orElse(false);
+                     .orElse(false);
             }
         });
         return js;
@@ -83,6 +91,10 @@ public class FinderPluginDescribeParser implements IPluginDescribeParser {
 
     @Override
     public boolean supports(StandardPluginDescribe standardPluginDescribe) {
+        // 排他性验证
+        if (standardPluginDescribe.getLabels().exist(EDescribeLabel.EXCLUSIVE_PARSER.label())){
+            return false;
+        }
         return !Optional.ofNullable(standardPluginDescribe.getDescribeResource()).isPresent()
                && Optional.ofNullable(standardPluginDescribe.getBaseDir()).isPresent();
     }
@@ -116,7 +128,7 @@ public class FinderPluginDescribeParser implements IPluginDescribeParser {
             return parseInfo;
 
         }
-        // 没有找到类描述文件,这就表示这不是一个合格的插件,记录异常,抛出事件,上层会自动处理null
+        // TODO 没有找到类描述文件,这就表示这不是一个合格的插件,记录异常,抛出事件,上层会自动处理null
         return null;
     }
 

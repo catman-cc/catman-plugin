@@ -1,5 +1,6 @@
 package cc.catman.plugin.describe.handler.dir;
 
+import cc.catman.plugin.describe.DescribeMapper;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.provider.LocalFileSystemPluginDescribeProvider;
 import lombok.Data;
@@ -17,7 +18,14 @@ import java.util.List;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class DirPluginParseInfo extends PluginParseInfo {
-
+    static {
+        DescribeMapper.getFactory()
+                .classMap(PluginParseInfo.class,DirPluginParseInfo.class)
+                .field("dynamic['dirs']","dirs")
+                .field("dynamic['supportPluginDescFileNames']","supportPluginDescFileNames")
+                .byDefault()
+                .register();
+    }
     private List<String> dirs;
     private List<String> supportPluginDescFileNames;
 }

@@ -1,17 +1,20 @@
 package cc.catman.plugin.describe;
 
-import cc.catman.plugin.runtime.IPluginInstance;
 import cc.catman.plugin.classloader.configuration.IClassLoaderConfiguration;
 import cc.catman.plugin.describe.enmu.EPluginParserStatus;
 import cc.catman.plugin.describe.handler.IPluginParserInfoHandler;
 import cc.catman.plugin.describe.parser.IPluginDescribeParser;
 import cc.catman.plugin.describe.parser.IPluginParserContext;
+import cc.catman.plugin.runtime.IPluginInstance;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 插件的解析信息,该实例分为三个状态:
@@ -52,6 +55,17 @@ public class PluginParseInfo extends StandardPluginDescribe {
 
     private List<String> orderlyClassLoadingStrategy;
 
+    /**
+     * 此处用于捕获所有未声明的配置信息
+     */
+
+    @JsonAnySetter
+    private Map<String, Object> dynamicValues;
+    @JsonAnyGetter
+    public Map<String, Object> getDynamicValues() {
+        return dynamicValues;
+    }
+
     void updatePluginInstance(IPluginInstance pluginInstance){
         this.pluginInstance=pluginInstance;
         if (null!=pluginInstance){
@@ -59,14 +73,16 @@ public class PluginParseInfo extends StandardPluginDescribe {
         }
     }
     public <T extends PluginParseInfo> T decode(Class<T> clazz){
-        T decode = this.parser.decode(this, clazz);
-        decode.setParser(parser);
-        decode.setInitialized(true);
+        T decode= DescribeMapper.getMapper().map(this,clazz);
         decode.updatePluginInstance(pluginInstance);
-        decode.setClassLoaderConfiguration(classLoaderConfiguration);
-        decode.setPluginParserContext(pluginParserContext);
-        decode.setClassLoader(classLoader);
-        decode.setHandlerChain(this.getHandlerChain());
+//        decode = this.parser.decode(this, clazz);
+//        decode.setParser(parser);
+//        decode.setInitialized(true);
+//        decode.updatePluginInstance(pluginInstance);
+//        decode.setClassLoaderConfiguration(classLoaderConfiguration);
+//        decode.setPluginParserContext(pluginParserContext);
+//        decode.setClassLoader(classLoader);
+//        decode.setHandlerChain(this.getHandlerChain());
         return decode;
     }
 }

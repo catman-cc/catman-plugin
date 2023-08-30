@@ -2,10 +2,13 @@ package cc.catman.plugin.describe.parser;
 
 import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.describe.PluginParseInfo;
+import cc.catman.plugin.describe.enmu.DescribeConstants;
+import cc.catman.plugin.describe.enmu.EDescribeLabel;
 import cc.catman.plugin.describe.enmu.EPluginParserStatus;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+
+import java.util.Optional;
 
 public abstract class AbstractJacksonPluginDescribeParser implements  IPluginDescribeParser{
 
@@ -14,25 +17,32 @@ public abstract class AbstractJacksonPluginDescribeParser implements  IPluginDes
     protected abstract ObjectMapper createObjectMapper();
 
     @Override
+    public boolean supports(StandardPluginDescribe standardPluginDescribe) {
+        // 排他性验证
+       return standardPluginDescribe.getLabels()
+                .notExistLabelOrLabelHasValue(
+                        EDescribeLabel.EXCLUSIVE_PARSER.label()
+                        , DescribeConstants.NEED_PARSER_PLUGIN_DESCRIBE_FILE
+                )&& doSupports(standardPluginDescribe);
+    }
+
+    protected abstract boolean doSupports(StandardPluginDescribe standardPluginDescribe);
+
+    @Override
     @SneakyThrows
     public PluginParseInfo wrapper(StandardPluginDescribe standardPluginDescribe) {
-        JsonNode node = objectMapper.readTree(standardPluginDescribe.getDescribeResource().getInputStream());
-        String kind=node.get("kind").asText();
-        String source=node.get("source").asText();
-        // 如果pluginDescribe已经包含了一些基础信息,这里的copy操作需要将原始的信息传递过来.
-        // 值得注意的是,如果
-        PluginParseInfo parseInfo = PluginParseInfo.builder()
-                .parser(this)
-                .kind(kind)
-                .source(source)
-                .status(EPluginParserStatus.WAIT_PARSE)
-                .afterHandlers(standardPluginDescribe.getAfterHandlers())
-                .afterParsers(standardPluginDescribe.getAfterParsers())
-                .describeResource(standardPluginDescribe.getDescribeResource())
-                .build();
-        // 初次解析时,插件的描述信息只有上述内容,因为上述内容是不需要解析配置文件就可以获取的数据
-        parseInfo.callAfterParsers();
-        return parseInfo;
+        PluginParseInfo pluginParseInfo = objectMapper.readValue(standardPluginDescribe.getDescribeResource().getInputStream(), PluginParseInfo.class);
+        pluginParseInfo.setParser(this);
+        pluginParseInfo.setStatus(EPluginParserStatus.WAIT_PARSE);
+        pluginParseInfo.setAfterHandlers(standardPluginDescribe.getAfterHandlers());
+        pluginParseInfo.setAfterParsers(standardPluginDescribe.getAfterParsers());
+        pluginParseInfo.setDescribeResource(standardPluginDescribe.getDescribeResource());
+        pluginParseInfo.callAfterParsers();
+        pluginParseInfo.getLabels().add(EDescribeLabel.DESCRIBE_FILE_PARSED.label(),getClass().getCanonicalName());
+        // 移除排他性
+        pluginParseInfo.getLabels().rm(EDescribeLabel.EXCLUSIVE_PARSER.label()
+                , DescribeConstants.NEED_PARSER_PLUGIN_DESCRIBE_FILE);
+        return pluginParseInfo;
     }
 
     @Override

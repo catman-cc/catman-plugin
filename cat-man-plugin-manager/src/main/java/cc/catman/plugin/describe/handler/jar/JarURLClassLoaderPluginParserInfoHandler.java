@@ -39,13 +39,15 @@ public class JarURLClassLoaderPluginParserInfoHandler extends AbstractURLClassLo
     @Override
     @SneakyThrows
     public List<PluginParseInfo> handler(PluginParseInfo parseInfo) {
+        // 获取相对路径,得到项目的跟地址,然后加载其中的所有资源,最后生成一个URLClassLoader
+        Path workDir = parseInfo.getDescribeResource().getFile().toPath().resolveSibling(parseInfo.getRelativePath());
+
         final JarPluginParseInfo jpd = covert(parseInfo, JarPluginParseInfo.class);
         // 第一次加载,所使用的描述文件可能需要被插件内部的描述文件所替换,是否替换根据当前插件描述文件来控制
 
 
         // 获取了一个jar类型的插件描述信息
-        // 获取相对路径,得到项目的跟地址,然后加载其中的所有资源,最后生成一个URLClassLoader
-        Path workDir = jpd.getDescribeResource().getFile().toPath().resolveSibling(jpd.getRelativePath());
+
         // 支持ant语法
         AntPathMatcher pathMatcher = new AntPathMatcher();
         List<URL> urls = new ArrayList<>();
