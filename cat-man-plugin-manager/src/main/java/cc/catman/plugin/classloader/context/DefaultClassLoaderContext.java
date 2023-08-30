@@ -2,6 +2,8 @@ package cc.catman.plugin.classloader.context;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import cc.catman.plugin.runtime.IPluginInstance;
@@ -13,8 +15,8 @@ import cc.catman.plugin.classloader.handler.Payload;
 import cc.catman.plugin.classloader.strategy.ClassLoadingStrategyProcessor;
 import cc.catman.plugin.classloader.strategy.EClassLoadingStrategy;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
-import org.springframework.util.CollectionUtils;
 
 public class DefaultClassLoaderContext implements ClassLoaderContext {
 
@@ -34,12 +36,12 @@ public class DefaultClassLoaderContext implements ClassLoaderContext {
     protected ClassLoadingStrategyProcessor classLoadingStrategyProcessor=createClassLoadingStrategyProcessor();
 
     private ClassLoadingStrategyProcessor createClassLoadingStrategyProcessor() {
-        return new ClassLoadingStrategyProcessor();
+        return new ClassLoadingStrategyProcessor(Objects.requireNonNull(pluginInstance).getPluginOptions());
     }
 
     protected ConfigurableClassLoaderEnhancer classLoaderEnhancer;
 
-    public DefaultClassLoaderContext(IClassLoaderConfiguration classLoaderConfiguration,IPluginInstance pluginInstance) {
+    public DefaultClassLoaderContext(IClassLoaderConfiguration classLoaderConfiguration,@NonNull IPluginInstance pluginInstance) {
         this.classLoaderConfiguration = classLoaderConfiguration;
         this.pluginInstance=pluginInstance;
     }
@@ -52,12 +54,22 @@ public class DefaultClassLoaderContext implements ClassLoaderContext {
     @Override
     public Class<?> loadClass(String className,ClassLoader classLoader, Function<String, Class<?>> f)
             throws SecurityException, ClassNotFoundException {
+
+        // 类型名称重映射
+        String ncm= Optional.ofNullable(pluginInstance.getPluginOptions().getRedirectToTheSpecifiedClasses()).map(map->{
+                if (map.containsKey(className)){
+                    return map.get(className);
+                }
+                return className;
+            }).orElse(className);
+
         Payload payload = new Payload();
-        payload.setClassName(className);
+        payload.setClassName(ncm);
         payload.setContext(this);
         payload.setClassLoader(classLoader);
         payload.setSelfLoadFunction(f);
         payload.setPluginInstance(this.pluginInstance);
+        payload.setOrderStrategies(orderlyClassLoadingStrategy);
 
         IClassLoaderHandler chain = getClassLoaderConfiguration().getClassLoaderHandler();
         payload = chain.before(payload);
@@ -65,11 +77,7 @@ public class DefaultClassLoaderContext implements ClassLoaderContext {
 
         if (!payload.loadedClass()){
             // 前面的处理器已经获取了class定义
-            List<String> orderStrategies= CollectionUtils.isEmpty(this.pluginInstance.getOrderlyClassLoadingStrategy())
-                    ?orderlyClassLoadingStrategy
-                    :this.getPluginInstance().getOrderlyClassLoadingStrategy();
-
-            if (classLoadingStrategyProcessor.loadClass(orderStrategies,payload)){
+            if (classLoadingStrategyProcessor.loadClass(payload)){
                 payload.setClazz(f.apply(payload.getClassName()));
                 payload.resetContinue();
             }else {

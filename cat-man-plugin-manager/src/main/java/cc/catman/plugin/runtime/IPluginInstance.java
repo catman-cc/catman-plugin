@@ -2,6 +2,7 @@ package cc.catman.plugin.runtime;
 
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.extensionPoint.IExtensionPointManager;
+import cc.catman.plugin.options.PluginOptions;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,8 +12,11 @@ import java.util.List;
  */
 public interface IPluginInstance {
     String getGroup();
+
     String getName();
+
     String getVersion();
+
     EPluginStatus getStatus();
     /**
      * 获取插件的类加载器
@@ -22,8 +26,11 @@ public interface IPluginInstance {
     void setClassLoader(ClassLoader classLoader);
 
     PluginParseInfo getPluginParseInfo();
+
     void  setPluginParseInfo(PluginParseInfo parseInfo);
 
+    PluginOptions getPluginOptions();
+    void setPluginOptions(PluginOptions option);
     /**
      * 获取受控的插件管理器
      */

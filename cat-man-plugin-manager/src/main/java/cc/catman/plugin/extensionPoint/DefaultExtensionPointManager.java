@@ -68,6 +68,7 @@ public class DefaultExtensionPointManager implements IExtensionPointManager {
                 .forEach(extensionPointInfo -> {
                     this.extensionPointInfos.add(extensionPointInfo);
                     cache.put(extensionPointInfo.getClassName(), extensionPointInfo);
+
                     pluginConfiguration.publish(ExtensionPointInfoEvent.of(ExtensionPointEventInfoName.ADD.name(), this, extensionPointInfo));
                 });
         // 推送事件,扩展点加载完毕

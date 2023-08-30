@@ -1,13 +1,9 @@
-package cc.catman.plugin.describe.handler.mvn;
+package cc.catman.plugin.describe.handler.maven;
 
 import cc.catman.plugin.common.Constants;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.describe.enmu.*;
-import cc.catman.plugin.describe.handler.maven.ECommand;
-import cc.catman.plugin.describe.handler.maven.MavenDownloadPluginParserInfoHandler;
-import cc.catman.plugin.describe.handler.maven.MavenOptions;
 import org.apache.maven.shared.invoker.*;
-import org.apache.maven.shared.utils.cli.CommandLineException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 

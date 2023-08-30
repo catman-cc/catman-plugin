@@ -3,6 +3,7 @@ package cc.catman.plugin.runtime;
 import cc.catman.plugin.common.GAV;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.extensionPoint.IExtensionPointManager;
+import cc.catman.plugin.options.PluginOptions;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -49,13 +50,16 @@ public class DefaultPluginInstance implements IPluginInstance{
     @Getter
     @Setter
     protected List<String> orderlyClassLoadingStrategy;
-
-    public DefaultPluginInstance(IPluginManager ownerPluginManager, PluginParseInfo parseInfo) {
+    @Getter
+    @Setter
+    protected PluginOptions pluginOptions;
+    public DefaultPluginInstance(IPluginManager ownerPluginManager, PluginParseInfo parseInfo,PluginOptions options) {
         this.setGroup(parseInfo.getGroup());
         this.setName(parseInfo.getName());
         this.setVersion(parseInfo.getVersion());
         this.setStatus(EPluginStatus.INIT);
         this.ownerPluginManager=ownerPluginManager;
+        this.pluginOptions=options;
         this.pluginParseInfo = parseInfo;
         this.classLoader = parseInfo.getClassLoader();
         // 加载所以的插件,然后进一步交给插件管理器来处理

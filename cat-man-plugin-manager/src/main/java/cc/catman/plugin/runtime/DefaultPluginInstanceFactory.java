@@ -7,7 +7,7 @@ import cc.catman.plugin.extensionPoint.IExtensionPointManagerFactory;
 public class DefaultPluginInstanceFactory implements IPluginInstanceFactory{
     @Override
     public IPluginInstance create(IPluginManager pluginManager, PluginParseInfo pluginParseInfo) {
-        DefaultPluginInstance pluginInstance=new DefaultPluginInstance(pluginManager,pluginParseInfo);
+        DefaultPluginInstance pluginInstance=new DefaultPluginInstance(pluginManager,pluginParseInfo,pluginManager.getPluginOptions().createChild());
         // 设置类加载器,从描述信息中获取所有的扩展点数据,
         // 初始化扩展点管理器
         IExtensionPointManagerFactory extensionPointManagerFactory=pluginManager.getPluginConfiguration().getExtensionPointManagerFactory();

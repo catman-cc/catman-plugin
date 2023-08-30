@@ -3,7 +3,7 @@ package cc.catman.plugin.describe.handler.mvn;
 import cc.catman.plugin.describe.PluginParseInfo;
 import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.describe.handler.maven.MavenOptions;
-import cc.catman.plugin.describe.handler.maven.MavenPluginParseInfo;
+import cc.catman.plugin.describe.handler.maven.NormalMavenLibsDownloadPluginParserInfoHandler;
 import cc.catman.plugin.describe.parser.IPluginDescribeParser;
 import cc.catman.plugin.describe.resources.JarResourceBrowser;
 import junit.framework.TestCase;
@@ -26,7 +26,7 @@ public class NormalMavenLibsDownloadPluginParserInfoHandlerTest extends TestCase
 
     @SneakyThrows
     private static PluginParseInfo initPluginParseInfo() {
-        MavenPluginParseInfo p = MavenPluginParseInfo.builder()
+        PluginParseInfo p = PluginParseInfo.builder()
                 .group("cc.catman.plugin")
                 .name("cat-man-plugin-examples-plugins")
                 .version("1.0.0")

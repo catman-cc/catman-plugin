@@ -1,5 +1,6 @@
 package cc.catman.plugin.extensionPoint;
 
+import cc.catman.plugin.extensionPoint.finder.AdditionalExtensionPointFinder;
 import cc.catman.plugin.extensionPoint.finder.DefaultExtensionPointFinder;
 import cc.catman.plugin.runtime.IPluginInstance;
 
@@ -13,6 +14,7 @@ public class DefaultExtensionPointManagerFactory implements IExtensionPointManag
 
     public void post( DefaultExtensionPointManager extensionPointManager){
         extensionPointManager.extensionPointFinders.add(new DefaultExtensionPointFinder(extensionPointManager.pluginInstance));
+        extensionPointManager.extensionPointFinders.add(new AdditionalExtensionPointFinder(extensionPointManager.pluginInstance));
 //        extensionPointManager.extensionPointMatchers.add(new DefaultExtensionPointMatcher());
     }
 }

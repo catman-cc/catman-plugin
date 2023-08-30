@@ -5,6 +5,7 @@ import cc.catman.plugin.describe.StandardPluginDescribe;
 import cc.catman.plugin.operator.IPluginExtensionPointOperator;
 import cc.catman.plugin.operator.IPluginOperator;
 import cc.catman.plugin.operator.PluginOperatorOptions;
+import cc.catman.plugin.options.PluginOptions;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,8 @@ public interface IPluginManager  {
 
     IPluginManager createNew( List<StandardPluginDescribe> standardPluginDescribes);
 
+    PluginOptions getPluginOptions();
+    void  setPluginOptions(PluginOptions pluginOptions);
 
     // 插件自定义加载策略
     default List<String> getOrderlyClassLoadingStrategy(){

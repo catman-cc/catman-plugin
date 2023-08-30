@@ -7,6 +7,7 @@ import cc.catman.plugin.describe.enmu.EPluginParserStatus;
 import cc.catman.plugin.event.plugin.EPluginEventName;
 import cc.catman.plugin.event.plugin.PluginEvent;
 import cc.catman.plugin.operator.*;
+import cc.catman.plugin.options.PluginOptions;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.CollectionUtils;
@@ -39,16 +40,31 @@ public class DefaultPluginManager implements IPluginManager {
     @Setter
     private IPluginInstance ownerPluginInstance;
 
+    /**
+     * 插件的配置信息
+     */
+    @Getter
+    @Setter
+    protected PluginOptions pluginOptions;
+
     public DefaultPluginManager(IPluginConfiguration pluginConfiguration, List<StandardPluginDescribe> standardPluginDescribes) {
+        this(pluginConfiguration,standardPluginDescribes, PluginOptions.of());
+    }
+
+    public DefaultPluginManager(IPluginConfiguration pluginConfiguration, List<StandardPluginDescribe> standardPluginDescribes, PluginOptions pluginOptions) {
         this.pluginConfiguration = pluginConfiguration;
         this.standardPluginDescribes = standardPluginDescribes;
+        this.pluginOptions = pluginOptions;
     }
+
+
+
 
     @Override
     public IPluginManager createNew( List<StandardPluginDescribe> standardPluginDescribes) {
-        DefaultPluginManager defaultPluginManager = new DefaultPluginManager(this.pluginConfiguration,  standardPluginDescribes);
+        DefaultPluginManager defaultPluginManager = new DefaultPluginManager(this.pluginConfiguration,  standardPluginDescribes, pluginOptions.createChild());
         defaultPluginManager.setOrderlyClassLoadingStrategy(getOrderlyClassLoadingStrategy());
-        return new DefaultPluginManager(this.pluginConfiguration, standardPluginDescribes);
+        return defaultPluginManager;
     }
 
     @Override

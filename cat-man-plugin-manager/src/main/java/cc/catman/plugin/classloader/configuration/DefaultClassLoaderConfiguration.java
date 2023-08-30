@@ -2,12 +2,9 @@ package cc.catman.plugin.classloader.configuration;
 
 import java.util.Optional;
 
+import cc.catman.plugin.classloader.handler.*;
 import cc.catman.plugin.runtime.IPluginInstance;
 import cc.catman.plugin.classloader.cglib.ConfigurableClassLoaderEnhancer;
-import cc.catman.plugin.classloader.handler.DefaultClassLoaderHandlerChain;
-import cc.catman.plugin.classloader.handler.ExcludeClassNameHandler;
-import cc.catman.plugin.classloader.handler.IClassLoaderHandler;
-import cc.catman.plugin.classloader.handler.RedirectClassLoaderHandler;
 
 public class DefaultClassLoaderConfiguration implements IClassLoaderConfiguration {
 
@@ -19,7 +16,13 @@ public class DefaultClassLoaderConfiguration implements IClassLoaderConfiguratio
     protected IClassLoaderHandler createClassHandlerChain() {
         DefaultClassLoaderHandlerChain chain = new DefaultClassLoaderHandlerChain();
         ExcludeClassNameHandler e = ExcludeClassNameHandler.create();
-        return chain.addHandler(e).addHandler(new RedirectClassLoaderHandler());
+        ClassLoadingStrategySortedHandlerChain classLoadingStrategySortedHandlerChain=new ClassLoadingStrategySortedHandlerChain();
+        DynamicClassNameClassLoaderHandler dynamicClassNameClassLoaderHandler=new DynamicClassNameClassLoaderHandler();
+        return chain
+                .addHandler(e)
+                .addHandler(new RedirectClassLoaderHandler())
+                .addHandler(classLoadingStrategySortedHandlerChain)
+                .addHandler(dynamicClassNameClassLoaderHandler);
     }
 
     @Override

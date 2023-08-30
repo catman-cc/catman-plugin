@@ -1,4 +1,4 @@
-package cc.catman.plugin.describe.handler.mvn;
+package cc.catman.plugin.describe.handler.maven;
 
 import cc.catman.plugin.common.GAV;
 import org.springframework.core.io.Resource;

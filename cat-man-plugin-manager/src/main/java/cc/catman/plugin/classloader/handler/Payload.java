@@ -5,6 +5,7 @@ import cc.catman.plugin.classloader.context.ClassLoaderContext;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Data
@@ -42,6 +43,11 @@ public class Payload {
     private Class<?> clazz;
 
     private Function<String, Class<?>> selfLoadFunction;
+
+    /**
+     * 当前类的加载策略
+     */
+    private List<String> orderStrategies;
 
 
     public boolean hasError() {

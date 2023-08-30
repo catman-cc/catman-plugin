@@ -38,7 +38,7 @@ public class DefaultClassNameMatcher implements IClassNameMatcher {
         return this;
     }
 
-    protected DefaultClassNameMatcher addExcluudeClasses(String classNames) {
+    protected DefaultClassNameMatcher addExcludeClasses(String classNames) {
         for (String c : excludeClasses) {
             if (!this.excludeClasses.contains(c)) {
                 this.excludeClasses.add(c);
@@ -47,7 +47,7 @@ public class DefaultClassNameMatcher implements IClassNameMatcher {
         return this;
     }
 
-    protected DefaultClassNameMatcher addExcluudeRegexs(String... regexs) {
+    protected DefaultClassNameMatcher addExcludeRegexs(String... regexs) {
         for (String r : regexs) {
             if (!this.excludeRegex.containsKey(r)) {
                 this.excludeRegex.put(r, Pattern.compile(r));
