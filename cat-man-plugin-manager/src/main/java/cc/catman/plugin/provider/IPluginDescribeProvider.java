@@ -1,7 +1,7 @@
 package cc.catman.plugin.provider;
 
-import cc.catman.plugin.describe.StandardPluginDescribe;
-import cc.catman.plugin.describe.parser.IPluginParserContext;
+import cc.catman.plugin.core.describe.PluginParseInfo;
+import cc.catman.plugin.core.describe.StandardPluginDescribe;
 
 import java.util.List;
 
@@ -11,8 +11,5 @@ import java.util.List;
  */
 public interface IPluginDescribeProvider {
 
-    List<StandardPluginDescribe> provider();
-    IPluginParserContext getPluginParserContext();
-
-    void setPluginParserContext(IPluginParserContext pluginParserContext);
+    List<PluginParseInfo> provider();
 }

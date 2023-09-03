@@ -8,21 +8,20 @@ import lombok.NonNull;
 import java.util.*;
 
 public class ClassLoadingStrategyProcessor {
-    private PluginOptions options;
 
 
 
     @Getter
     protected  Map<String,IClassLoadingStrategy> strategies=createStrategies();
 
-    public ClassLoadingStrategyProcessor(@NonNull PluginOptions options) {
-        this.options = options;
+    public ClassLoadingStrategyProcessor() {
     }
     private Map<String, IClassLoadingStrategy> createStrategies() {
-        strategies.put(EClassLoadingStrategy.PARENT.name(),new ParentClassLoadingStrategy());
-        strategies.put(EClassLoadingStrategy.SELF.name(),new SelfClassLoadingStrategy());
-        strategies.put(EClassLoadingStrategy.DEPENDENCY.name(),new DependenciesClassLoadingStrategy());
-        return strategies;
+        Map<String, IClassLoadingStrategy> strategyMap=new HashMap<>();
+        strategyMap.put(EClassLoadingStrategy.PARENT.name(),new ParentClassLoadingStrategy());
+        strategyMap.put(EClassLoadingStrategy.SELF.name(),new SelfClassLoadingStrategy());
+        strategyMap.put(EClassLoadingStrategy.DEPENDENCY.name(),new DependenciesClassLoadingStrategy());
+        return strategyMap;
     }
 
     public ClassLoadingStrategyProcessor registryStrategy(String type,IClassLoadingStrategy strategy){

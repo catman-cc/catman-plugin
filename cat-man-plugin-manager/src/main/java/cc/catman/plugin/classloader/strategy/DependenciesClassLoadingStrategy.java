@@ -11,8 +11,15 @@ public class DependenciesClassLoadingStrategy implements IClassLoadingStrategy{
         IPluginInstance pluginInstance=payload.getPluginInstance();
         // 获取插件实例的插件管理器
         IPluginManager pluginManager = pluginInstance.getPluginManager();
-        // 然后加载类定义,即递归向下寻找类型定义
-        payload.setClazz(pluginManager.deepFindClass(payload.getClassName(), 1));
+        for (IPluginInstance instance : pluginManager.getPluginInstances()) {
+            try {
+                Class<?> aClass = instance.getClassLoader().loadClass(payload.getClassName());
+                payload.setClazz(aClass);
+               return payload.loadedClass();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return payload.loadedClass();
     }
 }

@@ -1,6 +1,7 @@
 package cc.catman.plugin.operator;
 
 
+import cc.catman.plugin.event.extensionPoint.WatchExtensionPointEventListener;
 import cc.catman.plugin.extensionPoint.ExtensionPointInfo;
 
 import java.util.List;
@@ -30,9 +31,14 @@ public interface IExtensionPointOperator {
         return list(type, ExtensionPointInfo::canUse, e->true);
     }
 
+    default <T> List<T> list(Class<T> type, Optional<WatchExtensionPointEventListener> watch){
+        return list(type, ExtensionPointInfo::canUse, e->true,watch);
+    }
+
     <T> Optional<T> first(Class<T> type);
 
     <T> List<T> list(Class<T> type, Predicate<ExtensionPointInfo> beforeInstance,Predicate<T> afterInstance);
+    <T> List<T> list(Class<T> type, Predicate<ExtensionPointInfo> beforeInstance,Predicate<T> afterInstance,Optional<WatchExtensionPointEventListener> watch);
 
     default <T> List<T> listWithInstanceFactory(Class<T> type, Function<Class<T>,T > factory){
         return listWithInstanceFactory(type,factory, ExtensionPointInfo::canUse, e->true);
@@ -42,6 +48,8 @@ public interface IExtensionPointOperator {
    default  <T> List<Class<T>> listClazz(Class<T> type){
        return listClazz(type,e->true);
    }
+
+    <T> Stream<T> streamWithInstanceFactory(Class<T> type, Function<Class<T>, T> factory, Predicate<ExtensionPointInfo> filter, Optional<WatchExtensionPointEventListener> watchExtensionPointEventListener);
 
     <T> List<Class<T>> listClazz(Class<T> type, Predicate<ExtensionPointInfo> filter);
 
@@ -55,6 +63,8 @@ public interface IExtensionPointOperator {
    default  <T> Stream<T> stream(Class<T> type){
        return stream(type,e->true);
    }
+
+    <T> List<T> listWithInstanceFactory(Class<T> type, Function<Class<T>, T> factory, Predicate<ExtensionPointInfo> beforeInstance, Predicate<T> afterInstance, Optional<WatchExtensionPointEventListener> watch);
 
     <T> Stream<T> stream(Class<T> type, Predicate<ExtensionPointInfo> filter);
 

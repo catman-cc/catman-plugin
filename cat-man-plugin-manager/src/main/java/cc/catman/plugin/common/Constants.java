@@ -17,4 +17,12 @@ public class Constants {
      * 基于maven的普通依赖pom文件
      */
     public static final String PLUGIN_MAVEN_NORMAL_DEPENDENCIES_POM_FILE_NAME="cat-man-plugin-maven.pom";
+
+    public static final String DEFAULT_NORMAL_DEPENDENCIES_LIBS_DIR="libs";
+
+    public static final String[] JDK_EXCLUDED_PACKAGES = new String[] { "apple.",
+            "com.apple", "java.", "javax.", "jdk", "sun.",
+            "com.sun",
+            "oracle.",
+            "javassist.", "org.aspectj.", "net.sf.cglib." };
 }

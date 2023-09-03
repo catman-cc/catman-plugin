@@ -1,7 +1,6 @@
 package cc.catman.plugin.provider;
 
-import cc.catman.plugin.describe.StandardPluginDescribe;
-import cc.catman.plugin.describe.parser.IPluginParserContext;
+import cc.catman.plugin.core.describe.PluginParseInfo;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.core.io.FileSystemResource;
@@ -35,12 +34,10 @@ public class LocalFileSystemPluginDescribeProvider implements IPluginDescribePro
     @Builder.Default
     private List<String> pluginDescFileNamesPatterns = Arrays.asList(DEFAULT_SUPPORT_PLUGIN_DESC_FILE_NAMES);
 
-    protected IPluginParserContext pluginParserContext;
-
         @Override
-     public List<StandardPluginDescribe> provider(){
+     public List<PluginParseInfo> provider(){
        return   this.dirs.stream().map(Paths::get).map(basedir->{
-             List<StandardPluginDescribe> standardPluginDescribes =new ArrayList<>();
+             List<PluginParseInfo> standardPluginDescribes =new ArrayList<>();
            AntPathMatcher pathMatcher=new AntPathMatcher();
              try {
 
@@ -59,7 +56,7 @@ public class LocalFileSystemPluginDescribeProvider implements IPluginDescribePro
                          Path relativePath=basedir.relativize(file);
 
                          if (pluginDescFileNamesPatterns.stream().anyMatch(p-> pathMatcher.match(p,relativePath.toString()))){
-                             standardPluginDescribes.add(StandardPluginDescribe.builder().describeResource(new FileSystemResource(relativePath)).build());
+                             standardPluginDescribes.add(PluginParseInfo.builder().describeResource(new FileSystemResource(relativePath)).build());
                              // 如果在一个目录下找到了一个插件,那么就会跳过该文件的同级目录及其子目录,理论上,插件应该不会出现多级嵌套,所以这里这么处理应该没问题.
                              // 算了还是完全放开吧
                              return FileVisitResult.CONTINUE;

@@ -36,7 +36,7 @@ public class DefaultClassLoaderContext implements ClassLoaderContext {
     protected ClassLoadingStrategyProcessor classLoadingStrategyProcessor=createClassLoadingStrategyProcessor();
 
     private ClassLoadingStrategyProcessor createClassLoadingStrategyProcessor() {
-        return new ClassLoadingStrategyProcessor(Objects.requireNonNull(pluginInstance).getPluginOptions());
+        return new ClassLoadingStrategyProcessor();
     }
 
     protected ConfigurableClassLoaderEnhancer classLoaderEnhancer;

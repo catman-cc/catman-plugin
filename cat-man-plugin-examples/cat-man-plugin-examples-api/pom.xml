@@ -24,6 +24,7 @@
             <groupId>cc.catman.plugin</groupId>
             <artifactId>cat-man-plugin-annotation-processor</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

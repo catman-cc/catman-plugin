@@ -8,5 +8,6 @@ public enum EPluginEventName {
     DISABLE, // 禁用插件
     ENABLE,  // 启用插件
     UNLOAD,  // 卸载插件
-    FAIL, 处理中出现了失败
+    STATUS_CHANGE, // 状态发生变化
+    FAIL, // 处理中出现了失败
 }

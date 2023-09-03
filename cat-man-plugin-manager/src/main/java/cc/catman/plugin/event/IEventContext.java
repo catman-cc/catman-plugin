@@ -19,5 +19,7 @@ public interface IEventContext<T extends IEvent,R extends EventAck<?>> {
      */
     void  addListener(IEventListener<T,R> listener);
 
+    void removeListener(IEventListener<?,?> listener);
+
     void publish(T event);
 }

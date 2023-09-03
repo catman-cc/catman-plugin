@@ -39,4 +39,8 @@ public class GAV {
         }
         return this.version.equals(other.version);
     }
+
+    public String toString(String split){
+        return getGroup()+split+getName()+split+getVersion();
+    }
 }

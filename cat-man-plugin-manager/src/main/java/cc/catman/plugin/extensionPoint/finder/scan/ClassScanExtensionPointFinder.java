@@ -1,7 +1,7 @@
 package cc.catman.plugin.extensionPoint.finder.scan;
 
 import cc.catman.plugin.common.FileUtils;
-import cc.catman.plugin.describe.StandardPluginDescribe;
+import cc.catman.plugin.core.describe.StandardPluginDescribe;
 import cc.catman.plugin.extensionPoint.ExtensionPointInfo;
 import cc.catman.plugin.extensionPoint.finder.IExtensionPointFinder;
 import cc.catman.plugin.runtime.IPluginInstance;

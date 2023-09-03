@@ -2,7 +2,6 @@ package cc.catman.plugin.event;
 
 import lombok.Getter;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.util.TypeUtils;
 
 public class DefaultEventPublisher<T extends IEvent,R extends EventAck<?>>
         extends ParameterizedTypeReference<T>
@@ -24,7 +23,6 @@ public class DefaultEventPublisher<T extends IEvent,R extends EventAck<?>>
             return false;
         }
         return true;
-//       return TypeUtils.isAssignable(getType(),event.getClass());
     }
 
     @SuppressWarnings("unchecked")

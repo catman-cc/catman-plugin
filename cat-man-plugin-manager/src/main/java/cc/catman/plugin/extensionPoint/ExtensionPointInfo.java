@@ -37,6 +37,7 @@ public class ExtensionPointInfo {
     /**
      * 允许针对特定类型重写类定义
      */
+    @Builder.Default
     private Map<Class<?>,Class<?>> overloads=new HashMap<>();
 
     public boolean canUse(){
@@ -44,5 +45,17 @@ public class ExtensionPointInfo {
     }
     public Class<?> toClass(Class<?> want){
         return overloads.getOrDefault(want,getClazz());
+    }
+
+    public ExtensionPointInfo deepNew(){
+       return ExtensionPointInfo.builder()
+                .className(getClassName())
+                .clazz(getClazz())
+                .disable(isDisable())
+                .valid(isValid())
+                .object(getObject())
+                .overloads(new HashMap<>(getOverloads()))
+                .build();
+
     }
 }

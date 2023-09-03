@@ -6,12 +6,14 @@ import java.util.function.Function;
 
 import cc.catman.plugin.classloader.matcher.DefaultClassNameMatcher;
 import cc.catman.plugin.classloader.matcher.IClassNameMatcher;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 用于将指定类分发至特定类加载器,比如,jdk自带的类型,必须使用jdk的类加载器
  *
  * Note. 这是一个很重要的功能,如果禁用了该功能,那么插件将无法加载系统自带的类定义
  */
+@Slf4j
 public class RedirectClassLoaderHandler implements IClassLoaderHandler {
     public static final String[] JDK_EXCLUDED_PACKAGES = new String[] { "apple.",
             "com.apple", "java.", "javax.", "jdk", "sun.",
@@ -25,6 +27,7 @@ public class RedirectClassLoaderHandler implements IClassLoaderHandler {
         redirectRules = new ArrayList<>();
         redirectRules.add(new RedirectRule( DefaultClassNameMatcher.of(JDK_EXCLUDED_PACKAGES), (payload) -> {
             try {
+                log.debug("[{}] belongs to the type defined by JDK and will be loaded with the system loader.",payload.getClassName());
                 Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(payload.getClassName());
                 payload.setClazz(clazz);
 

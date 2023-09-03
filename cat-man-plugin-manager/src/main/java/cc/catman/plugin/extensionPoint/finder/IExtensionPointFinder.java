@@ -1,6 +1,6 @@
 package cc.catman.plugin.extensionPoint.finder;
 
-import cc.catman.plugin.describe.StandardPluginDescribe;
+import cc.catman.plugin.core.describe.StandardPluginDescribe;
 import cc.catman.plugin.extensionPoint.ExtensionPointInfo;
 
 import java.util.stream.Stream;

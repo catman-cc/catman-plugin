@@ -1,6 +1,6 @@
 package cc.catman.plugin.event.extensionPoint;
 
-import cc.catman.plugin.describe.StandardPluginDescribe;
+import cc.catman.plugin.core.describe.StandardPluginDescribe;
 import cc.catman.plugin.event.AbstractEvent;
 import cc.catman.plugin.extensionPoint.IExtensionPointManager;
 import cc.catman.plugin.runtime.IPluginConfiguration;
@@ -27,12 +27,5 @@ public class ExtensionPointEvent extends AbstractEvent {
     private Throwable error;
 
 
-    public static ExtensionPointEvent of(String eventName, IExtensionPointManager extensionPointManager){
-        return ExtensionPointEvent.builder()
-                .extensionPointManager(extensionPointManager)
-                .pluginConfiguration(extensionPointManager.getPluginInstance().getPluginManager().getPluginConfiguration())
-                .pluginInstance(extensionPointManager.getPluginInstance())
-                .eventName(eventName)
-                .build();
-    }
+
 }

@@ -40,4 +40,12 @@ public class DefaultEventBus implements IEventBus {
             }
         }
     }
+
+    @Override
+    public void removeListener(IEventListener<?, ?> listener) {
+        this.listeners.remove(listener);
+        eventPublishers.forEach(ep->{
+            ep.getEventContext().removeListener(listener);
+        });
+    }
 }

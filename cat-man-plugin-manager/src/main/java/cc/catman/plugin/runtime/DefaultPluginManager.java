@@ -1,24 +1,23 @@
 package cc.catman.plugin.runtime;
 
 import cc.catman.plugin.common.GAV;
-import cc.catman.plugin.describe.StandardPluginDescribe;
-import cc.catman.plugin.describe.PluginParseInfo;
-import cc.catman.plugin.describe.enmu.EPluginParserStatus;
-import cc.catman.plugin.event.plugin.EPluginEventName;
-import cc.catman.plugin.event.plugin.PluginEvent;
+import cc.catman.plugin.core.describe.PluginParseInfo;
+import cc.catman.plugin.enums.EPluginParserStatus;
 import cc.catman.plugin.operator.*;
 import cc.catman.plugin.options.PluginOptions;
+import cc.catman.plugin.processor.IParsingProcessProcessor;
+import cc.catman.plugin.processor.IParsingProcessProcessorFactory;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * 默认的插件管理器实现
  */
+@Slf4j
 public class DefaultPluginManager implements IPluginManager {
     @Getter
     @Setter
@@ -31,7 +30,9 @@ public class DefaultPluginManager implements IPluginManager {
     /**
      * 保留原始的数据,便于后面提供类似于watch的机制.
      */
-    protected List<StandardPluginDescribe> standardPluginDescribes;
+    @Getter
+    @Setter
+    protected List<PluginParseInfo> standardPluginDescribes;
 
     @Getter
     @Setter
@@ -40,6 +41,9 @@ public class DefaultPluginManager implements IPluginManager {
     @Setter
     private IPluginInstance ownerPluginInstance;
 
+    @Getter
+    protected IParsingProcessProcessorFactory parsingProcessProcessorFactory;
+
     /**
      * 插件的配置信息
      */
@@ -47,36 +51,31 @@ public class DefaultPluginManager implements IPluginManager {
     @Setter
     protected PluginOptions pluginOptions;
 
-    public DefaultPluginManager(IPluginConfiguration pluginConfiguration, List<StandardPluginDescribe> standardPluginDescribes) {
+    public DefaultPluginManager(IPluginConfiguration pluginConfiguration, List<PluginParseInfo> standardPluginDescribes) {
         this(pluginConfiguration,standardPluginDescribes, PluginOptions.of());
     }
 
-    public DefaultPluginManager(IPluginConfiguration pluginConfiguration, List<StandardPluginDescribe> standardPluginDescribes, PluginOptions pluginOptions) {
+    public DefaultPluginManager(IPluginConfiguration pluginConfiguration, List<PluginParseInfo> standardPluginDescribes, PluginOptions pluginOptions) {
         this.pluginConfiguration = pluginConfiguration;
         this.standardPluginDescribes = standardPluginDescribes;
         this.pluginOptions = pluginOptions;
+        this.parsingProcessProcessorFactory=pluginConfiguration.getParsingProcessProcessorFactory();
     }
 
 
 
 
     @Override
-    public IPluginManager createNew( List<StandardPluginDescribe> standardPluginDescribes) {
-        DefaultPluginManager defaultPluginManager = new DefaultPluginManager(this.pluginConfiguration,  standardPluginDescribes, pluginOptions.createChild());
+    public IPluginManager createNew(  IPluginInstance instance,List<PluginParseInfo> standardPluginDescribes) {
+        DefaultPluginManager defaultPluginManager = new DefaultPluginManager(
+                this.pluginConfiguration
+                ,  standardPluginDescribes
+                , getPluginConfiguration()
+                .createPluginOptions(this,instance.getPluginParseInfo())
+        );
+
         defaultPluginManager.setOrderlyClassLoadingStrategy(getOrderlyClassLoadingStrategy());
         return defaultPluginManager;
-    }
-
-    @Override
-    public Class<?> deepFindClass(String name, int deep) {
-        // 从所有实例中寻找类型
-        for (IPluginInstance pluginInstance : pluginInstances) {
-            Class<?> aClass = pluginInstance.deepFindClass(name, deep);
-            if (aClass != null) {
-                return aClass;
-            }
-        }
-        return null;
     }
 
     @Override
@@ -95,67 +94,104 @@ public class DefaultPluginManager implements IPluginManager {
     }
 
     public void start() {
-        start(standardPluginDescribes, pluginInstances);
+        // 解析
+        install(standardPluginDescribes);
+        // 启动插件,在启动插件时,应该先启动依赖项,然后再启动自身
+        pluginInstances.forEach(IPluginInstance::start);
     }
 
-    public void start(List<StandardPluginDescribe> standardPluginDescribes, List<IPluginInstance> pluginInstances) {
-        // TODO 上报事件,插件管理器开始启动
-        // 1. 获取所有的provider,生成类描述文件
-        // 2. 将所有的插件描述进一步进行处理
-        List<PluginParseInfo> pluginParseInfos = loadPluginParseInfos(standardPluginDescribes);
-
-
-        // 3. 所有的插件解析信息,将继续转换为插件
-        List<PluginParseInfo> parsedInfos = handlerPluginParseInfos(pluginParseInfos);
-        // 4. 区分插件的处理状态,筛选出成功和失败的插件
-        createPluginInstance(pluginInstances, parsedInfos);
+    @Override
+    public void stop() {
+        stop(true);
     }
-
-    protected void createPluginInstance(List<IPluginInstance> pluginInstances, List<PluginParseInfo> parsedInfos) {
-        parsedInfos.forEach(pi -> {
-            if (EPluginParserStatus.FAIL.equals(pi.getStatus())) {
-                // TODO 插件解析失败,根据配置决定如何处理
-                pluginConfiguration.getEventBus().publish(PluginEvent.builder()
-                        .pluginInstance(pi.getPluginInstance())
-                        .pluginConfiguration(pluginConfiguration)
-                        .eventName(EPluginEventName.FAIL.name())
-                        .build());
-            } else if (EPluginParserStatus.WAIT_PARSE.equals(pi.getStatus())){
+    @Override
+    public void stop(boolean stopDependencies){
+        // 判断插件是否可以停止
+        IPluginInstance is = getOwnerPluginInstance();
+        if (is.getReferencePluginInstance().stream().anyMatch(ri->{
+            EPluginStatus status = ri.getStatus();
+            if ( EPluginStatus.STOPPING.equals(status)||EPluginStatus.STOP.equals(status)){
+                return false;
             }
-            else {
-                IPluginInstance pluginInstance = pi.getPluginInstance();
-                pluginInstance.setClassLoader(pi.getClassLoader());
-                // 除了失败,一定是成功的
-                pluginInstances.add(pi.getPluginInstance());
-                // TODO 此时启动插件是否不太合理
-                pi.getPluginInstance().start();
-            }
-        });
+            log.warn("can not stop plugin:{},because the Reference plugin:{} is not stop status"
+                    ,is.getPluginParseInfo().toGAV(),ri.getPluginParseInfo().toGAV());
+            return true;
+        })){
+            log.warn("{} stop operation was skip...",is.getPluginParseInfo().toGAV());
+            return;
+        }
+        if (stopDependencies){
+            // 停止当前插件管理器使用的插件以及/停止当前插件依赖的插件
+            Set<IPluginInstance> piCopy = new HashSet<>(pluginInstances);
+            piCopy.addAll(getOwnerPluginInstance().getUsedPluginInstance());
+            piCopy.forEach(IPluginInstance::stop);
+        }else {
+            pluginInstances.forEach(IPluginInstance::stop);
+        }
     }
 
-    protected List<PluginParseInfo> handlerPluginParseInfos(List<PluginParseInfo> pluginParseInfos) {
+    @Override
+    public void stop(GAV gav, int deep){
+        IPluginOperator pluginVisitor = createPluginVisitor(PluginOperatorOptions.builder()
+                .onlyReady(false)
+                .build());
+        pluginVisitor.list(gav,deep).forEach(IPluginInstance::stop);
+    }
+
+    @Override
+    public void stop(PluginParseInfo parseInfo, int deep){
+        stop(parseInfo.toGAV(),deep);
+    }
+    @Override
+    public void stop(IPluginInstance instance){
+            instance.stop();
+    }
+
+    public List<IPluginInstance> process(List<PluginParseInfo> pluginParseInfos){
+        IParsingProcessProcessor processor = getParsingProcessProcessorFactory().create(pluginParseInfos,this);
+        // 启动
+      return processor.process();
+    }
+
+    @Override
+    public List<IPluginInstance> install(List<PluginParseInfo> pluginParseInfos) {
+       return process(pluginParseInfos);
+    }
+
+    @Override
+    public List<IPluginInstance> install(PluginParseInfo parseInfo) {
+       return install(Collections.singletonList(parseInfo));
+    }
+
+    @Override
+    public void unInstall( GAV gav,int deep){
+        IPluginOperator pluginVisitor = createPluginVisitor(PluginOperatorOptions.builder()
+                .onlyReady(false)
+                .build());
+        pluginVisitor.list(gav,deep).forEach(IPluginInstance::uninstall);
+    }
+
+    @Override
+    public void replace(PluginParseInfo old, PluginParseInfo n){
+        unInstall(old);
+        install(n);
+    }
+
+    @Override
+    public IPluginInstance registryPluginInstance(PluginParseInfo pi) {
         IPluginInstanceFactory pluginInstanceFactory = getPluginConfiguration().getPluginInstanceFactory();
-        return pluginParseInfos.stream()
-                .flatMap(pi -> {
-                    // 装载插件实例
-                    IPluginInstance instance = pluginInstanceFactory.create(this, pi);
-                    if (!CollectionUtils.isEmpty(pi.getOrderlyClassLoadingStrategy())) {
-                        instance.setOrderlyClassLoadingStrategy(pi.getOrderlyClassLoadingStrategy());
-                    }
-                    pi.setStatus(EPluginParserStatus.WAIT_PARSE);
-                    pi.setPluginInstance(instance);
-                    pi.setClassLoaderConfiguration(pluginConfiguration.getClassLoaderConfiguration());
-                    return getPluginConfiguration().getPluginParserInfoHandlerContext().handler(pi).stream();
-                })
-                .collect(Collectors.toList());
+        IPluginInstance instance = pluginInstanceFactory.create(this, pi);
+        if (!CollectionUtils.isEmpty(pi.getOrderlyClassLoadingStrategy())) {
+            instance.setOrderlyClassLoadingStrategy(pi.getOrderlyClassLoadingStrategy());
+        }
+        pi.setStatus(EPluginParserStatus.PROCESSING);
+        pi.setPluginInstance(instance);
+        pi.setClassLoaderConfiguration(pluginConfiguration.getClassLoaderConfiguration());
+        // 初始化插件实例
+        instance.updateStatus(EPluginStatus.INIT);
+        // 除了失败,一定是成功的
+        pluginInstances.add(pi.getPluginInstance());
+        return instance;
     }
-
-    protected List<PluginParseInfo> loadPluginParseInfos(List<StandardPluginDescribe> standardPluginDescribes) {
-        return standardPluginDescribes
-                .stream()
-                .flatMap(pd -> getPluginConfiguration().getPluginParserContext().parser(pd).stream())
-                .collect(Collectors.toList());
-    }
-
 
 }

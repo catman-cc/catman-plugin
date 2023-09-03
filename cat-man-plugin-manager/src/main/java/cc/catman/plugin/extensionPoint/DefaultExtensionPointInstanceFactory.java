@@ -3,9 +3,9 @@ package cc.catman.plugin.extensionPoint;
 import lombok.SneakyThrows;
 
 public class DefaultExtensionPointInstanceFactory implements IExtensionPointInstanceFactory{
-    protected DefaultExtensionPointManager extensionPointManager;
+    protected IExtensionPointManager extensionPointManager;
 
-    public DefaultExtensionPointInstanceFactory(DefaultExtensionPointManager extensionPointManager) {
+    public DefaultExtensionPointInstanceFactory(IExtensionPointManager extensionPointManager) {
         this.extensionPointManager = extensionPointManager;
     }
 

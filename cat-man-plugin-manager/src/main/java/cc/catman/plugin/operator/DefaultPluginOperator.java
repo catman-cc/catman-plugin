@@ -1,6 +1,7 @@
 package cc.catman.plugin.operator;
 
 import cc.catman.plugin.common.GAV;
+import cc.catman.plugin.core.describe.PluginParseInfo;
 import cc.catman.plugin.runtime.IPluginInstance;
 import cc.catman.plugin.runtime.IPluginManager;
 import cc.catman.plugin.runtime.PluginInstanceTree;
@@ -83,5 +84,9 @@ public class DefaultPluginOperator implements IPluginOperator {
         List<IPluginInstance> pis = new ArrayList<>();
         every(pluginFilter, deep, pis::add);
         return pis;
+    }
+
+    public IPluginInstance add(PluginParseInfo parseInfo){
+        return null;
     }
 }

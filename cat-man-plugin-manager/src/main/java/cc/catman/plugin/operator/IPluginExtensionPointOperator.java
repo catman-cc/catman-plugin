@@ -1,15 +1,19 @@
 package cc.catman.plugin.operator;
 
 import cc.catman.plugin.common.GAV;
+import cc.catman.plugin.event.extensionPoint.WatchExtensionPointEventListener;
 import cc.catman.plugin.runtime.IPluginInstance;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
  * 通过插件访问扩展点
  */
 public interface IPluginExtensionPointOperator {
+
+    <T> List<T> list(Class<T> type, Optional<WatchExtensionPointEventListener> watch);
 
     default <T> List<T> list(Class<T> type){
         return list(type, PluginOperatorHelper.all, PluginOperatorHelper.MAX_DEEP);
@@ -23,4 +27,6 @@ public interface IPluginExtensionPointOperator {
 
     // 限制类型 ,插件过滤器,限制插件的层级,是否查找插件的依赖项,以及依赖的深度
     <T> List<T> list(Class<T> type, Predicate<IPluginInstance> pluginFilter, int deep);
+
+    <T> List<T> list(Class<T> type, Predicate<IPluginInstance> pluginFilter, int deep,WatchExtensionPointEventListener watchExtensionPointEventListener);
 }

@@ -1,5 +1,6 @@
 package cc.catman.plugin.describe.resources;
 
+import cc.catman.plugin.resources.*;
 import junit.framework.TestCase;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

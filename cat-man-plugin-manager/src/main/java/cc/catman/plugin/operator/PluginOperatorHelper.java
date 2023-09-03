@@ -24,8 +24,7 @@ public class PluginOperatorHelper {
     public static  Predicate<IPluginInstance> disabled=p-> EPluginStatus.DISABLED.equals(p.getStatus());
 
     public static  Predicate<IPluginInstance> createGavFilter(GAV gav){
-        return pluginInstance -> GAV.builder().group(pluginInstance.getGroup()).name(pluginInstance.getName()).version(pluginInstance.getVersion()).build()
-                  .Match(gav);
+        return pluginInstance -> pluginInstance.getPluginParseInfo().matchGAV(gav);
     }
 
 }

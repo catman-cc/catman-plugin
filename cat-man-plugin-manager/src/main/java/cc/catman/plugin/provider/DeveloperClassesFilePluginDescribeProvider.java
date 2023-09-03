@@ -1,9 +1,10 @@
 package cc.catman.plugin.provider;
 
-import cc.catman.plugin.describe.StandardPluginDescribe;
-import cc.catman.plugin.describe.PluginParseInfo;
-import cc.catman.plugin.describe.enmu.EPluginKind;
-import cc.catman.plugin.describe.enmu.EPluginSource;
+import cc.catman.plugin.core.describe.StandardPluginDescribe;
+import cc.catman.plugin.core.describe.PluginParseInfo;
+import cc.catman.plugin.core.label.Label;
+import cc.catman.plugin.core.label.Labels;
+import cc.catman.plugin.enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -79,13 +80,13 @@ public class DeveloperClassesFilePluginDescribeProvider extends AbstractPluginDe
     }
 
     @Override
-    public List<StandardPluginDescribe> provider() {
+    public List<PluginParseInfo> provider() {
         Path workDir = Paths.get(baseDir);
         // 扫描工作目录下的所有地址,为其创建插件实例.
         return this.dirs.stream()
                 .map(workDir::resolve)
                 .map(basedir -> {
-                    List<StandardPluginDescribe> standardPluginDescribes = new ArrayList<>();
+                    List<PluginParseInfo> standardPluginDescribes = new ArrayList<>();
                     AntPathMatcher pathMatcher = new AntPathMatcher();
                     try {
                         Files.walkFileTree(basedir, new SimpleFileVisitor<Path>() {
@@ -104,9 +105,11 @@ public class DeveloperClassesFilePluginDescribeProvider extends AbstractPluginDe
 
                                 if (pluginDescFileNamesPatterns.stream().anyMatch(p -> pathMatcher.match(p, relativePath.toString()))) {
                                     standardPluginDescribes.add(
-                                            StandardPluginDescribe.builder().describeResource(new FileSystemResource(file))
+                                            PluginParseInfo.builder().describeResource(new FileSystemResource(file))
                                                     .afterParsers(afterParsers)
                                                     .afterHandlers(afterHandlers)
+                                                    .lifeCycle(ELifeCycle.PARSE.name())
+                                                    .labels(Labels.of(Label.create(EDescribeLabel.EXCLUSIVE_PARSER.derive(ELifeCycle.LOAD.name()), ExclusiveParserValue.DEVELOPER_CLASS_DIR.name())))
                                                     .build()
 
                                     );

@@ -23,16 +23,29 @@ public class DefaultIEventContext<T extends IEvent,R extends EventAck<?>> implem
     }
 
     @Override
+    public void removeListener(IEventListener<?, ?> listener) {
+        listeners.values().forEach(v->{
+            v.remove(listener);
+        });
+    }
+
+    @Override
     public void publish(T event) {
         String eventName = event.getEventName();
-        for (IEventListener<T,R> listener : listeners.getOrDefault(eventName, Collections.emptyList())) {
-           R ack= listener.handler(event);
-           if ( Optional.ofNullable(ack).isPresent()){
-               if (ack.isStopBroadcasting()){
-                   // 中断广播
-                   return;
-               }
-           }
+        List<IEventListener<T, R>> ls =new ArrayList<>( listeners.getOrDefault("*", Collections.emptyList()));
+        ls.addAll(listeners.getOrDefault(eventName, Collections.emptyList()));
+        try {
+            for (IEventListener<T,R> listener : ls) {
+                R ack= listener.handler(event);
+                if ( Optional.ofNullable(ack).isPresent()){
+                    if (ack.isStopBroadcasting()){
+                        // 中断广播
+                        return;
+                    }
+                }
+            }
+        }catch (ClassCastException e){
+            e.printStackTrace();
         }
     }
 }

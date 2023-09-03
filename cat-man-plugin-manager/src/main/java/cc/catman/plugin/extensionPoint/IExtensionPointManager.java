@@ -18,4 +18,6 @@ public interface IExtensionPointManager  {
     IExtensionPointOperator createIExtensionPointVisitor();
     void start();
 
+    void stop();
+
 }

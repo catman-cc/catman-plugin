@@ -33,6 +33,8 @@ public class DefaultClassLoaderHandlerChain implements IClassLoaderHandler {
                         clh.getClass().getSimpleName(), payload.getClassName());
             }
             if (!p.isContinue()) {
+                log.debug("class {} loading request was aborted, with:{}",
+                         payload.getClassName(),clh.getClass().getSimpleName());
                 return p;
             }
         }

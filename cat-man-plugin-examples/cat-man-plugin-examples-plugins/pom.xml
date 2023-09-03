@@ -22,6 +22,7 @@
             <groupId>cc.catman.plugin</groupId>
             <artifactId>cat-man-plugin-examples-api</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>cc.catman.plugin</groupId>

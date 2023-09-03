@@ -1,11 +1,12 @@
 package cc.catman.plugin.runtime;
 
-import cc.catman.plugin.describe.PluginParseInfo;
+import cc.catman.plugin.core.describe.PluginParseInfo;
 import cc.catman.plugin.extensionPoint.IExtensionPointManager;
 import cc.catman.plugin.options.PluginOptions;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 插件实例
@@ -23,9 +24,12 @@ public interface IPluginInstance {
      */
     ClassLoader getClassLoader();
 
-    void setClassLoader(ClassLoader classLoader);
-
     PluginParseInfo getPluginParseInfo();
+
+    Set<IPluginInstance> getReferencePluginInstance();
+    Set<IPluginInstance> getUsedPluginInstance();
+
+    void  addReference(IPluginInstance instance);
 
     void  setPluginParseInfo(PluginParseInfo parseInfo);
 
@@ -41,7 +45,6 @@ public interface IPluginInstance {
      */
     IPluginManager getPluginManager();
 
-    Class<?> deepFindClass(String name,int deep);
     /**
      * 获取扩展点管理器
      */
@@ -55,6 +58,12 @@ public interface IPluginInstance {
 
      void setOrderlyClassLoadingStrategy(List<String> strategies);
 
+    void addUsed(IPluginInstance instance);
+
+    void  updateStatus(EPluginStatus status);
     void start();
 
+    void stop();
+
+    void uninstall();
 }

@@ -1,6 +1,6 @@
 package cc.catman.plugin.runtime;
 
-import cc.catman.plugin.describe.PluginParseInfo;
+import cc.catman.plugin.core.describe.PluginParseInfo;
 
 /**
  * 插件实例化工程
