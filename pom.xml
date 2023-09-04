@@ -17,7 +17,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.1-SNAPSHOT</revision>
+        <revision>1.0.8</revision>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,6 +49,24 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Acc.catman.plugin.version=${project.version}</arg>
+                        <arg>-Acc.catman.plugin.group=${project.groupId}</arg>
+                        <arg>-Acc.catman.plugin.name=${project.artifactId}</arg>
+                    </compilerArgs>
+                    <fork>true</fork>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -1,11 +1,13 @@
 package cc.catman.plugin.core;
 
 import cc.catman.plugin.core.annotations.ExtensionPoint;
+import cc.catman.plugin.core.annotations.Gav;
 import cc.catman.plugin.core.annotations.Plugin;
 import cc.catman.plugin.core.annotations.Prop;
 import com.google.auto.service.AutoService;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
+import org.apache.maven.shared.utils.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -22,6 +24,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static cc.catman.plugin.core.CatManPluginAnnotationProcessor.EXTENSION_POINT_ANNOTATION_NAME;
@@ -46,10 +50,11 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
     private JsonWriter jsonWriter;
     private JsonObject jsonPlugin;
     private JsonArray jsonExtensionPoints;
-
+    private Map<String, String> options;
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
+         options = processingEnv.getOptions();
         this.messager = processingEnv.getMessager();
         Filer filer = processingEnv.getFiler();
         this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -104,9 +109,12 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
         if (null == plugin) {
             return;
         }
+        // 支持编译时通过-D的方式传参来修改版本号
+        String version = Optional.ofNullable(options.get("cc.catman.plugin.version")).orElse(plugin.version());
+        String group = Optional.ofNullable(options.get("cc.catman.plugin.group")).orElse(plugin.group());
         jsonPlugin.addProperty("name", plugin.name());
-        jsonPlugin.addProperty("group", plugin.group());
-        jsonPlugin.addProperty("version", plugin.version());
+        jsonPlugin.addProperty("group", group);
+        jsonPlugin.addProperty("version", version);
         jsonPlugin.addProperty("source", plugin.source());
         jsonPlugin.addProperty("kind", plugin.kind());
         jsonPlugin.addProperty("relativePath", plugin.relativePath());
@@ -118,6 +126,15 @@ public class CatManPluginAnnotationProcessor extends AbstractProcessor {
             props.addProperty(p.name(), p.value());
         }
         jsonPlugin.add("properties",props);
+        JsonArray dependencies = new JsonArray();
+        jsonPlugin.add("dependencies",dependencies);
+        for (Gav g:plugin.dependencies()){
+            JsonObject dependency = new JsonObject();
+            dependency.addProperty("group", !g.group().isEmpty()?g.group():plugin.group());
+            dependency.addProperty("name",g.name());
+            dependency.addProperty("version",!g.version().isEmpty()?g.version():version);
+            dependencies.add(dependency);
+        }
         resavePom();
     }
 

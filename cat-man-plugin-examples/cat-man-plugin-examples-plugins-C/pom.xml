@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cc.catman.plugin</groupId>
+        <artifactId>cat-man-plugin-examples</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>cat-man-plugin-examples-plugins-C</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>cc.catman.plugin</groupId>
+            <artifactId>cat-man-plugin-examples-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>cc.catman.plugin</groupId>
+            <artifactId>cat-man-plugin-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <!-- 该任务用于生成依赖文件-->
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>collect</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${project.build.directory}/classes/META-INF/cat-man-plugin/cat-man-plugin-maven.deps</outputFile>
+                            <includeScope>runtime</includeScope>
+                            <outputScope>false</outputScope>
+                            <markersDirectory>${project.build.directory}/dependency-maven-plugin-markers</markersDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

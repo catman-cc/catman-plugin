@@ -40,5 +40,6 @@ public abstract class AbstractURLClassLoaderPluginParserInfoHandler extends Abst
         classLoader = classLoaderEnhancer.wrapper(classLoader, new Class[]{URL[].class, ClassLoader.class}, new Object[]{u, p});
         parseInfo.setStatus(EPluginParserStatus.COMPLETE);
         parseInfo.setClassLoader(classLoader);
+        processor.next(parseInfo);
     }
 }

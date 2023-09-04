@@ -1,7 +1,6 @@
 package cc.catman.plugin.handlers.afterload;
 
 import cc.catman.plugin.core.describe.PluginParseInfo;
-import cc.catman.plugin.core.label.Ls;
 import cc.catman.plugin.enums.ELifeCycle;
 import cc.catman.plugin.handlers.AbstractPluginParserInfoHandler;
 import cc.catman.plugin.processor.IParsingProcessProcessor;

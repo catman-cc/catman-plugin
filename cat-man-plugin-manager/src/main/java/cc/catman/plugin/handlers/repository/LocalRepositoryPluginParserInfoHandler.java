@@ -165,6 +165,9 @@ public class LocalRepositoryPluginParserInfoHandler extends AbstractPluginParser
     public void handlerFrom(StandardPluginDescribe pd){
         Optional.ofNullable(pd.getFrom())
                 .ifPresent(f->{
+                    if (pd.toGAV().equals(f.toGAV())){
+                        return;
+                    }
                     PluginParseInfo parseInfo=new PluginParseInfo();
                     parseInfo.setGroup(f.getGroup());
                     parseInfo.setName(f.getName());

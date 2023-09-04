@@ -33,6 +33,7 @@ public class JarURLClassLoaderPluginParserInfoHandler extends AbstractURLClassLo
     @Override
     public boolean doSupport(PluginParseInfo parseInfo) {
         return parseInfo.hasGAV()
+               && !Optional.ofNullable(parseInfo.getPluginInstance()).isPresent()
                && Optional.ofNullable(parseInfo.getDescribeResource()).isPresent()
                && Optional.ofNullable(parseInfo.getBaseDir()).isPresent();
     }
@@ -85,6 +86,7 @@ public class JarURLClassLoaderPluginParserInfoHandler extends AbstractURLClassLo
                 }
             });
         });
+        processor.finish(parseInfo);
         build(processor, jpd, urls);
 
         return false;

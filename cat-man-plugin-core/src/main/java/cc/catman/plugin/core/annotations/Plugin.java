@@ -18,5 +18,5 @@ public @interface Plugin {
     String[] libs() default {"libs/"};
 
     Prop[] properties() default {};
-
+    Gav[] dependencies() default {};
 }

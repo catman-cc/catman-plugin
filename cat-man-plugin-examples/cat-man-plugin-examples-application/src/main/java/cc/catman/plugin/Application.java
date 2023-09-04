@@ -15,7 +15,6 @@ import cc.catman.plugin.handlers.maven.MavenOptions;
 import cc.catman.plugin.handlers.maven.NormalMavenLibsMarketplacePluginParserInfoHandler;
 import cc.catman.plugin.operator.IPluginExtensionPointOperator;
 import cc.catman.plugin.provider.DirectPluginDescribeProvider;
-import cc.catman.plugin.runtime.IPluginInstance;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class Application {
                 PluginParseInfo.builder()
                         .group("cc.catman.plugin")
                         .name("cat-man-plugin-examples-plugins")
-                        .version("1.0.0")
+                        .version("1.0.8")
                         .build()
 
         ));
@@ -58,7 +57,7 @@ public class Application {
                 .localRepositoryDirectory("/Users/jpanda/.m2/repository")
                 .pluginRepositoryDirectory("/Users/jpanda/work/temp")
                 .mavenHome("/Users/jpanda/.sdkman/candidates/maven/current/")
-                .baseDir("/Users/jpanda/work/temp/cc/catman/plugin/cat-man-plugin-examples-plugins/1.0.0")
+                .baseDir("/Users/jpanda/work/temp/cc/catman/plugin/cat-man-plugin-examples-plugins/")
                 .debug(false)
                 .build();
 
