@@ -14,6 +14,7 @@
         <module>cat-man-plugin-annotation-processor</module>
         <module>cat-man-plugin-examples</module>
         <module>cat-man-plugin-maven</module>
+        <module>cat-man-plugin-spring</module>
     </modules>
 
     <properties>

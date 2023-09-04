@@ -19,22 +19,20 @@ public interface IPluginInstance {
     String getVersion();
 
     EPluginStatus getStatus();
+
+    PluginParseInfo getPluginParseInfo();
+
     /**
      * 获取插件的类加载器
      */
     ClassLoader getClassLoader();
 
-    PluginParseInfo getPluginParseInfo();
+    PluginOptions getPluginOptions();
 
     Set<IPluginInstance> getReferencePluginInstance();
+
     Set<IPluginInstance> getUsedPluginInstance();
 
-    void  addReference(IPluginInstance instance);
-
-    void  setPluginParseInfo(PluginParseInfo parseInfo);
-
-    PluginOptions getPluginOptions();
-    void setPluginOptions(PluginOptions option);
     /**
      * 获取受控的插件管理器
      */
@@ -49,18 +47,26 @@ public interface IPluginInstance {
      * 获取扩展点管理器
      */
     IExtensionPointManager getExtensionPointManager();
-    void setExtensionPointManager(IExtensionPointManager extensionPointManager);
 
     // 插件自定义加载策略
-     default List<String> getOrderlyClassLoadingStrategy(){
-         return Collections.emptyList();
-     }
+    default List<String> getOrderlyClassLoadingStrategy(){
+        return Collections.emptyList();
+    }
 
-     void setOrderlyClassLoadingStrategy(List<String> strategies);
+    void  setPluginParseInfo(PluginParseInfo parseInfo);
+
+    void setPluginOptions(PluginOptions option);
+
+    void setExtensionPointManager(IExtensionPointManager extensionPointManager);
+
+    void setOrderlyClassLoadingStrategy(List<String> strategies);
+
+    void  addReference(IPluginInstance instance);
 
     void addUsed(IPluginInstance instance);
 
     void  updateStatus(EPluginStatus status);
+
     void start();
 
     void stop();

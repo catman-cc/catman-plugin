@@ -11,11 +11,8 @@ import cc.catman.plugin.options.PluginOptions;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.cglib.proxy.MethodProxy;
-import org.slf4j.LoggerFactory;
 
 import java.beans.Introspector;
-import java.security.ProtectionDomain;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -41,32 +38,67 @@ public class DefaultPluginInstance implements IPluginInstance {
     @Getter
     @Setter
     protected String version;
+
+    /**
+     * 当前插件的状态
+     */
     @Getter
     @Setter
     protected EPluginStatus status;
 
+    /**
+     * 创建当前插件实例时,使用到的基础配置数据
+     */
     @Getter
     @Setter
     protected PluginParseInfo pluginParseInfo;
+
+    // ===   插件结构 START  ===
+    /**
+     * 管理当前插件的插件管理器
+     */
     @Getter
     protected IPluginManager ownerPluginManager;
+    /**
+     * 当前插件持有的插件管理器
+     */
     @Getter
     protected IPluginManager pluginManager;
 
+    /**
+     * 引用了当前插件实例的其他插件实例,或者说,依赖于当前插件的其他插件
+     */
     @Getter
     protected Set<IPluginInstance> referencePluginInstance;
+    /**
+     * 被当前插件引用的其他插件实例,或者说,当前插件依赖的插件
+     */
     @Getter
     protected Set<IPluginInstance> usedPluginInstance;
+    // ===   插件结构 END  ===
 
+    /**
+     * 当前插件用于管理扩展点的 扩展点管理器
+     */
     @Getter
     @Setter
     protected IExtensionPointManager extensionPointManager;
+
+
+    /**
+     * 当前插件加载class定义时,所使用的策略
+     */
     @Getter
     @Setter
     protected List<String> orderlyClassLoadingStrategy;
+
+    /**
+     * 当前插件所持有的特定的插件参数项
+     */
     @Getter
     @Setter
     protected PluginOptions pluginOptions;
+
 
     public DefaultPluginInstance(IPluginManager ownerPluginManager, PluginParseInfo parseInfo) {
         this.setGroup(parseInfo.getGroup());
@@ -93,6 +125,9 @@ public class DefaultPluginInstance implements IPluginInstance {
 
     }
 
+    /**
+     * 获取当前插件用于加载类的 ClassLoader
+     */
     @Override
     public ClassLoader getClassLoader() {
         return getPluginParseInfo().getClassLoader();
@@ -108,6 +143,9 @@ public class DefaultPluginInstance implements IPluginInstance {
         this.usedPluginInstance.add(instance);
     }
 
+    /**
+     * 更新插件的状态,同时推送状态变更事件
+     */
     @Override
     public void updateStatus(EPluginStatus status) {
         if (getStatus().equals(status)) {
@@ -133,15 +171,22 @@ public class DefaultPluginInstance implements IPluginInstance {
         updateStatus(EPluginStatus.WAIT_EXTENSION_POINTS_READY);
         this.extensionPointManager.start();
         // 获取插件对象
-        IExtensionPointOperator iExtensionPointVisitor = this.extensionPointManager.createIExtensionPointVisitor();
-        List<IPlugin> list = iExtensionPointVisitor.list(IPlugin.class);
+        IExtensionPointOperator epv = this.extensionPointManager.createIExtensionPointVisitor();
+        List<IPlugin> list=epv.list(IPlugin.class);
         for (IPlugin plugin : list) {
-            plugin.onload();
+            plugin.afterStart();
         }
         updateStatus(EPluginStatus.START);
     }
     @Override
     public void stop(){
+        // 获取插件对象
+        IExtensionPointOperator epv = this.extensionPointManager.createIExtensionPointVisitor();
+        List<IPlugin> list=epv.list(IPlugin.class);
+        for (IPlugin plugin : list) {
+            plugin.beforeStop();
+        }
+
         GAV gav = getPluginParseInfo().toGAV();
         log.debug("[{}] is stopping...", gav);
         updateStatus(EPluginStatus.STOPPING);

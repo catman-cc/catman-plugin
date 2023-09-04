@@ -16,6 +16,7 @@ public interface IExtensionPointManager  {
     IExtensionPointInstanceFactory getExtensionPointInstanceFactory();
 
     IExtensionPointOperator createIExtensionPointVisitor();
+
     void start();
 
     void stop();
