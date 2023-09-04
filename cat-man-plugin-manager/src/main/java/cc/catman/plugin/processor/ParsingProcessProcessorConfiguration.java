@@ -1,5 +1,6 @@
 package cc.catman.plugin.processor;
 
+import cc.catman.plugin.core.label.LabelsAnnotationHelper;
 import cc.catman.plugin.enums.EDescribeLabel;
 import cc.catman.plugin.enums.ELifeCycle;
 import cc.catman.plugin.handlers.IPluginParserInfoHandler;
@@ -45,7 +46,7 @@ public class ParsingProcessProcessorConfiguration {
     protected List<IPluginParserInfoHandler> handlers = new ArrayList<>();
 
     public ParsingProcessProcessorConfiguration addHandler(IPluginParserInfoHandler handler) {
-        this.handlers.add(handler);
+        this.handlers.add(LabelsAnnotationHelper.handler(handler));
         return this;
     }
 

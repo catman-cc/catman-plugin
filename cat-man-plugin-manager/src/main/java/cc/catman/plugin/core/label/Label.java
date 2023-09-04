@@ -15,16 +15,15 @@ import java.util.stream.Collectors;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Label implements ILabelAbility{
 
     @Getter
     private Labels labels;
 
-    @NonNull
-    final private String name;
+     private String name;
 
-    @NonNull
-    final private List<String> value;
+     private List<String> value;
 
     public static Label create(String name, String value) {
 

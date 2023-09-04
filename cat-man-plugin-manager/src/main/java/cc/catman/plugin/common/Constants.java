@@ -18,6 +18,8 @@ public class Constants {
      */
     public static final String PLUGIN_MAVEN_NORMAL_DEPENDENCIES_POM_FILE_NAME="cat-man-plugin-maven.pom";
 
+    public static final String LOCAL_CACHE_FILE_NAME="cat-man-plugin.cache";
+
     public static final String DEFAULT_NORMAL_DEPENDENCIES_LIBS_DIR="libs";
 
     public static final String[] JDK_EXCLUDED_PACKAGES = new String[] { "apple.",

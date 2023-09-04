@@ -68,9 +68,10 @@ public class Application {
 
 
         pluginConfiguration.getParsingProcessProcessorConfiguration()
+                .addHandler(new LocalRepositoryPluginParserInfoHandler(localRepositoryOption))
                 .addHandler(new NormalMavenLibsMarketplacePluginParserInfoHandler(mavenOptions))
                 .addHandler(new MavenMarketplacePluginParserInfoHandler(mavenOptions))
-                .addHandler(new LocalRepositoryPluginParserInfoHandler(localRepositoryOption));
+                ;
 
         RootPluginManager pm = RootPluginManager.from(pluginConfiguration);
         pm.start();
@@ -99,35 +100,30 @@ public class Application {
         });
 
 
-        pm.unInstall(GAV.builder().group("cc.catman.plugin")
-                .name("cat-man-plugin-examples-plugins")
-                .version("1.0.0").build());
-        // 无法获取插件实例对象了,但是已经被加载的实例依然可以使用,这是因为 对象->class->classloader
-        // 那如何动态移除list中的元素呢?
-        // 1. 订阅事件,订阅事件,相对来说比较容易实现
-
-        pluginConfiguration.removeListener(watchExtensionPointEventListener);
-        watchExtensionPointEventListener=null;
-
-        list.forEach(ns -> {
-            System.out.println(ns.echo("===> [application start]"));
-        });
-
-        List<IPluginInstance> s = pm.install(PluginParseInfo.builder()
-                .group("cc.catman.plugin")
-                .name("cat-man-plugin-examples-plugins")
-                .version("1.0.0")
-                .build());
-        s.forEach(IPluginInstance::start);
-
-        list.addAll(pluginExtensionPointOperator.list(NameService.class));
-        list.forEach(ns -> {
-            System.out.println(ns.echo("===> [application start]"));
-        });
-        try {
-            Thread.sleep(1000*60*60);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+//        pm.unInstall(GAV.builder().group("cc.catman.plugin")
+//                .name("cat-man-plugin-examples-plugins")
+//                .version("1.0.0").build());
+//        // 无法获取插件实例对象了,但是已经被加载的实例依然可以使用,这是因为 对象->class->classloader
+//        // 那如何动态移除list中的元素呢?
+//        // 1. 订阅事件,订阅事件,相对来说比较容易实现
+//
+//        pluginConfiguration.removeListener(watchExtensionPointEventListener);
+//        watchExtensionPointEventListener=null;
+//
+//        list.forEach(ns -> {
+//            System.out.println(ns.echo("===> [application start]"));
+//        });
+//
+//        List<IPluginInstance> s = pm.install(PluginParseInfo.builder()
+//                .group("cc.catman.plugin")
+//                .name("cat-man-plugin-examples-plugins")
+//                .version("1.0.0")
+//                .build());
+//        s.forEach(IPluginInstance::start);
+//
+//        list.addAll(pluginExtensionPointOperator.list(NameService.class));
+//        list.forEach(ns -> {
+//            System.out.println(ns.echo("===> [application start]"));
+//        });
     }
 }

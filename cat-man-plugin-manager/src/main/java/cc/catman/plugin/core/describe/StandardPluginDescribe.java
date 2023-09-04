@@ -18,14 +18,14 @@ import java.util.function.Consumer;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StandardPluginDescribe extends BasicPluginDescribe {
-
+    @JsonIgnore
     protected boolean normalDependencyInitializationCompleted;
     /**
      * 运行时,所依赖的插件
      */
     @Builder.Default
     protected List<PluginParseInfo> dependencies = new ArrayList<>();
-
+    @JsonIgnore
     protected StandardPluginDescribe from;
 
     @Builder.Default
@@ -46,6 +46,7 @@ public class StandardPluginDescribe extends BasicPluginDescribe {
 
     @Builder.Default
     @Getter
+    @JsonIgnore
     protected Stack<Consumer<IPluginInstance>> unInstallFunc =new Stack<>();
 
     /**
@@ -94,6 +95,7 @@ public class StandardPluginDescribe extends BasicPluginDescribe {
             from.callOnUnInstallFunctions(instance);
         });
     }
+
     public boolean matchGAV(GAV gav){
         if (toGAV().equals(gav)){
             return true;

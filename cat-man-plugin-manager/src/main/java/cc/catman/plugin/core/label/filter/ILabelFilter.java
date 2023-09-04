@@ -7,6 +7,8 @@ import cc.catman.plugin.core.label.ILabelAbility;
  */
 @FunctionalInterface
 public interface ILabelFilter {
+    ILabelFilter TRUE= l -> true;
+    ILabelFilter FALSE= l -> false;
     /**
      *  过滤标签,并返回
      * @param l 被标签化的实体

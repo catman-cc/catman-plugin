@@ -9,11 +9,11 @@ import cc.catman.plugin.runtime.IPluginInstance;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * 插件的解析信息,该实例分为三个状态:
@@ -43,6 +43,7 @@ public class PluginParseInfo extends StandardPluginDescribe {
     private boolean lifeCycleContinue=true;
 
     @JsonIgnore
+    @JsonSerialize
     private boolean initialized;
 
     @Builder.Default
@@ -51,6 +52,7 @@ public class PluginParseInfo extends StandardPluginDescribe {
     /**
      * 插件的解析状态
      */
+    @JsonIgnore
     private EPluginParserStatus status;
     @JsonIgnore
     private IClassLoaderConfiguration classLoaderConfiguration;
@@ -68,13 +70,14 @@ public class PluginParseInfo extends StandardPluginDescribe {
     /**
      * 此处用于捕获所有未声明的配置信息
      */
-
     @JsonAnySetter
-    private Map<String, Object> dynamicValues;
+    @Builder.Default
+    private Map<String, Object> dynamicValues=new HashMap<>();
       public Set<String> getTasks(String lifeCycle){
         return this.lifeCycleTasks.getOrDefault(lifeCycle,new LinkedHashSet<>());
     }
     @JsonAnyGetter
+
     public Map<String, Object> getDynamicValues() {
         return dynamicValues;
     }

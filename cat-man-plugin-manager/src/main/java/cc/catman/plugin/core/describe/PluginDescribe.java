@@ -1,9 +1,13 @@
 package cc.catman.plugin.core.describe;
 
+import cc.catman.plugin.core.label.filter.AndLabelFilter;
+import cc.catman.plugin.core.label.filter.GroupLabelFilter;
+import cc.catman.plugin.core.label.filter.ILabelFilter;
 import cc.catman.plugin.enums.EPluginKind;
 import cc.catman.plugin.enums.EPluginSource;
 import cc.catman.plugin.core.label.ILabelAbility;
 import cc.catman.plugin.core.label.Labels;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +25,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PluginDescribe implements ILabelAbility {
+public class PluginDescribe implements ILabelAbility,ILabelFilter {
     /**
      * 插件的来源,不同的来源可能对应着不同的处理方式
      * 比如:
@@ -43,6 +47,10 @@ public class PluginDescribe implements ILabelAbility {
 
     @Builder.Default
     protected Labels labels = Labels.empty();
+
+    @Builder.Default
+    @JsonIgnore
+     protected GroupLabelFilter filter=new AndLabelFilter();
 
     /**
      * 插件的基础地址
@@ -69,4 +77,9 @@ public class PluginDescribe implements ILabelAbility {
      */
     @Builder.Default
     protected List<Resource> normalDependencyLibraries=new ArrayList<>();
+
+    @Override
+    public boolean filter(ILabelAbility l) {
+        return this.filter.filter(l);
+    }
 }

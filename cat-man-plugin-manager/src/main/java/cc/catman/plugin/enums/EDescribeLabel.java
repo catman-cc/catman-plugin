@@ -14,6 +14,9 @@ public enum EDescribeLabel {
     NEED_DOWNLOAD_FROM_MARKET_PLACE("need-download-from-market-place"),// 需要从插件市场下载
 
     PARSE_HANDLER_CHAIN("parse-handler-chain"), // 解析链
+
+    LOCAL_CACHED("local_cached"),
+    LOAD_FROM_CACHE("local_from_cache") ,
     ;
     private String label;
 

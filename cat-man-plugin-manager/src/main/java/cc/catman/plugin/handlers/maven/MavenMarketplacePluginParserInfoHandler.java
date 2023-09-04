@@ -1,6 +1,8 @@
 package cc.catman.plugin.handlers.maven;
 
 import cc.catman.plugin.core.describe.PluginParseInfo;
+import cc.catman.plugin.core.label.L;
+import cc.catman.plugin.enums.DescribeConstants;
 import cc.catman.plugin.enums.EDescribeLabel;
 import cc.catman.plugin.handlers.AbstractURLClassLoaderPluginParserInfoHandler;
 import cc.catman.plugin.enums.ELifeCycle;
@@ -21,6 +23,7 @@ import java.util.*;
  * 如果一个插件,没有工作目录,没有描述文件,那就意味着这个插件需要从市场下载
  */
 @Slf4j
+@L(name = DescribeConstants.HANDLER_FEATURE_NAME, value = DescribeConstants.FEATURE_MARKET_PLACE)
 public class MavenMarketplacePluginParserInfoHandler extends AbstractURLClassLoaderPluginParserInfoHandler {
     private static final String MAVEN_MARKET_PLACE_NOT_FOUND = "maven-market-place-not-found";
     protected MavenOptions mavenOptions;

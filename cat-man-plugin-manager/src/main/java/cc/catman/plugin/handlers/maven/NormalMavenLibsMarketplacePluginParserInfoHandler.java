@@ -62,24 +62,29 @@ public class NormalMavenLibsMarketplacePluginParserInfoHandler extends MavenMark
         }
         // 将文件中的内容转换为maven坐标
         try {
-            String pomContext = PomFileHelper.readPom(normalDependencyLibrariesResource);
-            if (log.isTraceEnabled()){
-                log.trace("generator  dependency pom file,content:\n{}",pomContext);
-            }
-            // 将pom内容写入到插件所属的目录下,然后开始下载插件
-            Path pom = Files.write(Paths.get(parseInfo.getBaseDir(), Constants.PLUGIN_MAVEN_NORMAL_DEPENDENCIES_POM_FILE_NAME), pomContext.getBytes());
-            log.debug("write third-party dependency data to file :{}",pom);
-
             Path pluginDir = Paths.get(parseInfo.getBaseDir(), Constants.DEFAULT_NORMAL_DEPENDENCIES_LIBS_DIR);
-            Files.createDirectories(pluginDir);
-            List<String> list = new ArrayList<>(Arrays.asList(ECommand.DEPENDENCY_COPY_DEPENDENCIES.getCommand(),
-                    mavenOptions.isDebug()?"--debug":"",
-                    "-f " + pom,
-                    "-DoutputDirectory=" + pluginDir));
+            if (parseInfo.getLabels().noExist(EDescribeLabel.LOAD_FROM_CACHE.label())){
+                String pomContext = PomFileHelper.readPom(normalDependencyLibrariesResource);
+                if (log.isTraceEnabled()){
+                    log.trace("generator  dependency pom file,content:\n{}",pomContext);
+                }
+                // 将pom内容写入到插件所属的目录下,然后开始下载插件
+                Path pom = Files.write(Paths.get(parseInfo.getBaseDir(), Constants.PLUGIN_MAVEN_NORMAL_DEPENDENCIES_POM_FILE_NAME), pomContext.getBytes());
+                log.debug("write third-party dependency data to file :{}",pom);
 
-            InvocationResult result = invoke(parseInfo, list);
-            if (result.getExitCode() != 0) {
-                throw new RuntimeException(result.getExecutionException());
+
+                Files.createDirectories(pluginDir);
+                List<String> list = new ArrayList<>(Arrays.asList(ECommand.DEPENDENCY_COPY_DEPENDENCIES.getCommand(),
+                        mavenOptions.isDebug()?"--debug":"",
+                        "-f " + pom,
+                        "-DoutputDirectory=" + pluginDir));
+
+                InvocationResult result = invoke(parseInfo, list);
+                if (result.getExitCode() != 0) {
+                    throw new RuntimeException(result.getExecutionException());
+                }
+            }else {
+                log.debug("plugin load from cache ,skip call maven ...");
             }
             // 将插件资源转换为resource
             Files.walkFileTree(pluginDir, new SimpleFileVisitor<Path>() {

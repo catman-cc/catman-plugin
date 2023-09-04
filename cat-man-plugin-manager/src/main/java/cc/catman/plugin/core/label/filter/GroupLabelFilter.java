@@ -2,6 +2,7 @@ package cc.catman.plugin.core.label.filter;
 
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +15,7 @@ public abstract  class GroupLabelFilter implements ILabelFilter{
     protected List<ILabelFilter> labelFilters;
 
     public GroupLabelFilter() {
-
+        labelFilters=new ArrayList<>();
     }
     public GroupLabelFilter(ILabelFilter... labelFilters) {
         this();

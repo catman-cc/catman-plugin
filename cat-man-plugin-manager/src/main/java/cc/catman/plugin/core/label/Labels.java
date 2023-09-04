@@ -211,6 +211,10 @@ public class Labels implements ILabelAbility{
         });
     }
 
+    public Optional<Label> rm(String name, String... value) {
+        return rm(name,Arrays.asList(value));
+    }
+
     public Optional<Label> rm(String name, Collection<String> value) {
         return find(name).filter(l -> {
             l.remove(value);

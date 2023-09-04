@@ -16,4 +16,7 @@ public interface DescribeConstants {
      */
     String NEED_PARSER_PLUGIN_DESCRIBE_FILE="NEED_PARSER_PLUGIN_DESCRIBE_FILE";
 
+    String HANDLER_FEATURE_NAME="features";
+
+    String FEATURE_MARKET_PLACE="market";
 }

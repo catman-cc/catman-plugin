@@ -5,14 +5,24 @@ import org.springframework.cglib.core.Signature;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class ClassHelper {
+
+    public static void doWithSuper(Class<?> clazz, Consumer<Class<?>> consumer){
+        Optional.of(clazz.getInterfaces()).ifPresent(is->{
+            for (Class<?> i : is) {
+                doWithSuper(i,consumer);
+            }
+        });
+        Optional.ofNullable(clazz.getSuperclass()).ifPresent(pc->{
+            doWithSuper(pc,consumer);
+        });
+        consumer.accept(clazz);
+    }
 
     /**
      * 使用鸭嘴模式判断两个类是否可以互相转换

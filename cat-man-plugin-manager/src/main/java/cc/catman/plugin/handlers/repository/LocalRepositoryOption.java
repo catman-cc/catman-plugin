@@ -13,6 +13,8 @@ public class LocalRepositoryOption {
      */
     private Path repositoryDir;
 
+    private boolean deleteOther=true;
+
     /**
      * 插件存储时策略
      */

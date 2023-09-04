@@ -104,7 +104,7 @@ public class DefaultParsingProcessProcessor implements IParsingProcessProcessor 
 
        try {
          while (currentRound.size()>0){
-             log.debug(" start process,round:[{}],rounds size:{},finished size:{}",  roundNumber+1, currentRound.size(), finished.size());
+             log.trace(" start process,round:[{}],rounds size:{},finished size:{}",  roundNumber+1, currentRound.size(), finished.size());
              preProcess();
              doProcess();
              postProcess();
@@ -192,15 +192,18 @@ public class DefaultParsingProcessProcessor implements IParsingProcessProcessor 
         for (PluginParseInfo ppi : currentRound) {
             Optional<List<IPluginParserInfoHandler>> handlers =
                     Optional.ofNullable(this.lifeCyclePluginParsers.get(ppi.getLifeCycle()))
-                    .map(ps -> ps.stream().filter(p -> p.support(ppi))
-                            .collect(Collectors.toList()));
+                    .map(ps -> ps.stream()
+                            .filter(p -> p.support(ppi))
+                            .filter(ppi::filter)
+                            .collect(Collectors.toList())
+                    );
             if (handlers.isPresent()&&handlers.get().size()>0) {
                 List<IPluginParserInfoHandler> pihs = handlers.get();
                 for (IPluginParserInfoHandler pih : pihs) {
-                    log.debug("round:[{}],in [{}] lifeCycle, parser handler named:{},start handler:{}",roundNumber,ppi.getLifeCycle(),pih.getClass().getSimpleName(), ppi.toGAV());
+                    log.trace("round:[{}],in [{}] lifeCycle, parser handler named:{},start handler:{}",roundNumber,ppi.getLifeCycle(),pih.getClass().getSimpleName(), ppi.toGAV());
                         if (!pih.handler(this, ppi)) {
                             // 终止后续处理器的处理
-                            log.debug("[{}] send break signal...",pih.getClass().getSimpleName());
+                            log.trace("[{}] send break signal...",pih.getClass().getSimpleName());
                             break;
                         }
                 }
@@ -233,7 +236,9 @@ public class DefaultParsingProcessProcessor implements IParsingProcessProcessor 
             labels.add(EParseProcessLabel.ROUND_CREATE.label(), currentRound);
         }
         // 加入到下一阶段
-        nextRound.add(parseInfo);
+       if (!nextRound.contains(parseInfo)){
+           nextRound.add(parseInfo);
+       }
     }
 
     public PluginParseInfo createNext(PluginParseInfo from,PluginParseInfo parseInfo){
