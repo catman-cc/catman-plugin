@@ -21,8 +21,11 @@ public class Labels implements ILabelAbility{
     @Getter
     @Setter
     private Labels labels;
+
     @Getter
-    final private Map<String, Label> items;
+    @Setter
+    private Map<String, Label> items;
+
 
     public static Labels empty() {
         return new Labels();

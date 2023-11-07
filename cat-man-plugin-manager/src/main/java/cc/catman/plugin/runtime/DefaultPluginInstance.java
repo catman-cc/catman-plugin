@@ -13,10 +13,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.beans.Introspector;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 public class DefaultPluginInstance implements IPluginInstance {
@@ -148,7 +145,7 @@ public class DefaultPluginInstance implements IPluginInstance {
      */
     @Override
     public void updateStatus(EPluginStatus status) {
-        if (getStatus().equals(status)) {
+        if (Objects.equals(getStatus(), status)) {
             return;
         }
         IPluginConfiguration pluginConfiguration = this.getPluginManager().getPluginConfiguration();

@@ -26,6 +26,8 @@ public interface IParsingProcessProcessor {
     PluginParseInfo createNext(PluginParseInfo from,PluginParseInfo parseInfo);
 
 
+    boolean first(String lifeCycle);
+    boolean last(String lifeCycle);
 
     boolean beforeLifeCycles(String lifeCycle,String before);
 

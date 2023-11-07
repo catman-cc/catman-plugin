@@ -46,7 +46,7 @@ public interface IPluginManager  {
 
     IPluginInstance registryPluginInstance(PluginParseInfo parseInfo);
 
-    void start();
+    IPluginManager start();
     void stop();
 
     default void stop(GAV gav){

@@ -15,15 +15,6 @@ public class PluginAndExtensionPointExample implements NameService, IPlugin {
         return getClass().getName() + ":" + content;
     }
 
-    @Override
-    public void onload() {
-
-    }
-
-    @Override
-    public void beforeUnload() {
-
-    }
 
     @Override
     public void onDisable() {

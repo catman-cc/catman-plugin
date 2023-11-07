@@ -93,11 +93,12 @@ public class DefaultPluginManager implements IPluginManager {
         return createPluginExtensionPointOperator(createPluginVisitor(pluginOperatorOptions));
     }
 
-    public void start() {
+    public IPluginManager start() {
         // 解析
         install(standardPluginDescribes);
         // 启动插件,在启动插件时,应该先启动依赖项,然后再启动自身
         pluginInstances.forEach(IPluginInstance::start);
+        return this;
     }
 
     @Override

@@ -272,6 +272,18 @@ public class DefaultParsingProcessProcessor implements IParsingProcessProcessor 
         return parseInfo;
     }
 
+    @Override
+    public boolean first(String lifeCycle) {
+        this.lifeCycles.add(0,lifeCycle);
+        return false;
+    }
+
+    @Override
+    public boolean last(String lifeCycle) {
+        this.lifeCycles.add(this.lifeCycles.size()-1,lifeCycle);
+        return false;
+    }
+
     public PluginParseInfo createNext(PluginParseInfo from){
         PluginParseInfoHelper pluginParseInfoHelper = getPluginParseInfoHelper();
         PluginParseInfo n = pluginParseInfoHelper.create();
