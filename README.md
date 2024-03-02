@@ -29,3 +29,6 @@ framework is under development.
   - 允许用户在插件加载过程中嵌入自己的数据
   - [ ] 允许用户为特定插件提供独立的解析加载流程
 - [x] 强大的标签体系
+
+## 快速开始
+[如何使用.md](./documents/如何使用.md)
