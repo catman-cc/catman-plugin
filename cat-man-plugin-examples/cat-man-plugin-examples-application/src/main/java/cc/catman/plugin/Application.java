@@ -14,7 +14,12 @@ import cc.catman.plugin.handlers.maven.MavenMarketplacePluginParserInfoHandler;
 import cc.catman.plugin.handlers.maven.MavenOptions;
 import cc.catman.plugin.handlers.maven.NormalMavenLibsMarketplacePluginParserInfoHandler;
 import cc.catman.plugin.operator.IPluginExtensionPointOperator;
+import cc.catman.plugin.processor.IInjectPluginLifecycle;
+import cc.catman.plugin.processor.IParsingProcessProcessor;
+import cc.catman.plugin.processor.IParsingProcessProcessorFactory;
+import cc.catman.plugin.processor.IPluginLifecycleInjector;
 import cc.catman.plugin.provider.DirectPluginDescribeProvider;
+import cc.catman.plugin.runtime.IPluginManager;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -36,7 +41,15 @@ public class Application {
 //        DeveloperClassesFilePluginDescribeProvider provider =
 //                DeveloperClassesFilePluginDescribeProvider.of("cat-man-plugin-examples/cat-man-plugin-examples-plugins/target/classes/");
 
-        PluginConfiguration pluginConfiguration = new PluginConfiguration();
+PluginConfiguration pluginConfiguration = new PluginConfiguration();
+pluginConfiguration.getParsingProcessProcessorFactory()
+  .registerLifecycleInjector(new IPluginLifecycleInjector() {
+      @Override
+      public IInjectPluginLifecycle inject(IParsingProcessProcessor processor, IPluginManager pluginManager) {
+          return null;
+      }
+  });
+
         DirectPluginDescribeProvider directPluginDescribeProvider = new DirectPluginDescribeProvider(() -> Arrays.asList(
                 PluginParseInfo.builder()
                         .group("cc.catman.plugin")

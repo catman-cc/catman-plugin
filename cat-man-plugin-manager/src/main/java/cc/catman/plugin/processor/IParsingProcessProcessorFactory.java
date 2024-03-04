@@ -11,4 +11,6 @@ public interface IParsingProcessProcessorFactory {
     IParsingProcessProcessor create(List<PluginParseInfo> parseInfos, IPluginManager ownerPluginManager);
 
     List<IPluginParserInfoHandler> getHandlers();
+
+    IParsingProcessProcessorFactory registerLifecycleInjector(IPluginLifecycleInjector lifecycleInjector);
 }

@@ -32,3 +32,58 @@ framework is under development.
 
 ## 快速开始
 [如何使用.md](./documents/如何使用.md)
+
+## 开发相关
+> 插件系统的加载机制参考了maven的插件加载机制和Annotation Processor的加载机制,并且在此基础上进行了扩展.
+
+当前插件系统,将插件的加载过程拆分为多个生命周期,用户可以根据自己的需要为插件动态注入新的生命周期,目前内置的生命周期有:
+- UNKNOWN: 未知阶段,无法确认插件处于何种状态
+- ANALYZE: 分析阶段,插件处于此阶段时,插件系统会在有限的信息内对插件进行分析,判断插件的打包类型
+- ACHIEVE: 获取阶段,插件处于此阶段时,插件系统会尝试获取插件的资源
+- COMPILE: 编译阶段,插件处于此阶段时,插件系统会尝试编译插件,生成编译产物,主要是class文件及其静态资源,对于已获取最终资源的插件,此阶段会被跳过
+- BUILD: 构建阶段,插件处于此阶段时,插件系统会尝试基于编译产物构建插件,并尝试生成jar,war,zip,tar等文件,对于已获取最终资源的插件,此阶段会被跳过
+- SEARCH: 搜索阶段,插件处于此阶段时,插件系统会尝试搜索插件的描述信息,并将扩展点的信息加载到插件系统中
+- PARSE: 解析阶段,插件处于此阶段时,插件系统会尝试解析插件的描述信息,并将插件的描述信息加载到插件系统中
+- VERIFY: 验证阶段,插件处于此阶段时,插件系统会尝试验证插件的描述信息,并将插件的描述信息加载到插件系统中
+- PRE_LOAD: 插件加载前的准备工作,比如,获取第三方依赖资源,初始化插件的运行环境等
+- LOAD: 加载阶段,插件处于此阶段时,插件系统会尝试加载插件,并将其注册到对应的插件管理器中.
+- AFTER_LOAD: 插件加载后的工作,比如,初始化插件的运行环境,启动插件的运行环境等
+- FINISHED: 插件加载完成
+
+插件系统的加载过程是一个有限状态机,每个插件都有自己的状态,并且可以根据自己的状态进行状态转移,插件系统会根据插件的状态进行加载,并且在加载过程中
+,会触发一系列的事件,用户可以监听这些事件,并且根据自己的需要进行处理.
+
+同时,参考AnnotationProcessor的加载机制,插件系统将使用循环模型解析插件,允许插件在解析时,动态调整自己接下来要触发的生命周期.
+
+### 如何动态注入生命周期
+```java
+public class MyPluginLifecycleInjector implements IPluginLifecycleInjector {
+    @Override
+    public IInjectPluginLifecycle inject(IParsingProcessProcessor processor, IPluginManager pluginManager); {
+        // 注入一个新的生命周期
+       return new IInjectPluginLifecycle() {
+         @Override
+         public void injectLifecycle(){
+         
+         }
+         @Override
+         public IPluginParserInfoHandler providerHandler(){
+             return null;
+         }
+
+       };
+    }
+}
+``` 
+然后将其注入到插件系统中即可:
+```java
+PluginConfiguration pluginConfiguration = new PluginConfiguration();
+pluginConfiguration.getParsingProcessProcessorFactory()
+  .registerLifecycleInjector(new IPluginLifecycleInjector() {
+  @Override
+  public IInjectPluginLifecycle inject(IParsingProcessProcessor processor, IPluginManager pluginManager) {
+    return new MyPluginLifecycleInjector();
+  }
+});
+```
+

@@ -75,6 +75,9 @@ public class DefaultParsingProcessProcessor implements IParsingProcessProcessor 
     @Builder.Default
     private Map<String, List<IPluginParserInfoHandler>> lifeCyclePluginParsers = new HashMap<>();
 
+    @Builder.Default
+    private List<IPluginLifecycleInjector> lifecycleInjectors=new ArrayList<>();
+
     /**
      * 结束的插件描述信息
      */
@@ -97,6 +100,12 @@ public class DefaultParsingProcessProcessor implements IParsingProcessProcessor 
         ArrayList<IPluginParserInfoHandler> copy = new ArrayList<>(this.parserInfoHandlerList);
         this.parserInfoHandlerList.clear();
         copy.forEach(this::add);
+        this.lifecycleInjectors.forEach(l->{
+            IInjectPluginLifecycle inject = l.inject(this, this.ownerPluginManager);
+            inject.injectLifecycle();
+            IPluginParserInfoHandler handler = inject.providerHandler();
+            this.parserInfoHandlerList.add(handler);
+        });
         return this;
     }
 

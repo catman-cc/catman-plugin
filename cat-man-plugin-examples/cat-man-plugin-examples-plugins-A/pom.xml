@@ -6,7 +6,7 @@
     <parent>
         <groupId>cc.catman.plugin</groupId>
         <artifactId>cat-man-plugin-examples</artifactId>
-        <version>${revision}</version>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

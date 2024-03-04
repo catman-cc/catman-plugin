@@ -15,6 +15,12 @@ public class DefaultParsingProcessProcessorFactory implements IParsingProcessPro
         this.parsingProcessProcessorConfiguration = parsingProcessProcessorConfiguration;
     }
 
+    protected List<IPluginLifecycleInjector> injectPluginLifecycles = createLifeCycles();
+
+    private List<IPluginLifecycleInjector> createLifeCycles() {
+        return new ArrayList<>();
+    }
+
     protected List<IPluginParserInfoHandler> handlers = createHandlers();
     private List<IPluginParserInfoHandler> createHandlers() {
         return new ArrayList<>();
@@ -23,6 +29,13 @@ public class DefaultParsingProcessProcessorFactory implements IParsingProcessPro
     public List<IPluginParserInfoHandler> getHandlers() {
         return this.handlers;
     }
+
+    @Override
+    public IParsingProcessProcessorFactory registerLifecycleInjector(IPluginLifecycleInjector lifecycleInjector) {
+        this.injectPluginLifecycles.add(lifecycleInjector);
+        return this;
+    }
+
     @Override
     public DefaultParsingProcessProcessor create(List<PluginParseInfo> parseInfos, IPluginManager ownerPluginManager){
         return DefaultParsingProcessProcessor
@@ -33,6 +46,7 @@ public class DefaultParsingProcessProcessorFactory implements IParsingProcessPro
                 .idGenerator(parsingProcessProcessorConfiguration.idGenerator)
                 .pluginParseInfoHelper(parsingProcessProcessorConfiguration.pluginParseInfoHelper)
                 .lifeCycles(parsingProcessProcessorConfiguration.lifeCycles)
+                .lifecycleInjectors(injectPluginLifecycles)
                 .ownerPluginManager(ownerPluginManager)
                 .build().init();
     }

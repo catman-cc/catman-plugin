@@ -6,7 +6,8 @@
     <parent>
         <groupId>cc.catman.plugin</groupId>
         <artifactId>cat-man-plugin</artifactId>
-        <version>1.0.4</version>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>cat-man-plugin-spring</artifactId>
@@ -19,6 +20,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>cc.catman.plugin</groupId>
+            <artifactId>cat-man-plugin-manager</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Spring核心依赖 -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -37,10 +43,6 @@
             <artifactId>spring-context</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
-        <dependency>
-            <groupId>cc.catman.plugin</groupId>
-            <artifactId>cat-man-plugin-manager</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
     </dependencies>
 </project>
